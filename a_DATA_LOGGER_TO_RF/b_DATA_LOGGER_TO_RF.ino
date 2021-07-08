@@ -69,7 +69,7 @@ bool DataLogger::initialize() {
 bool DataLogger::initRTC() {
   Serial.println("Initializing RTC...");
 
-  int initTime = 10;
+  int initTime = 3;
 
   for (int i = 0; i < initTime; i++) {
     Serial.print(initTime - i);
@@ -143,6 +143,7 @@ void DataLogger::sweep() {
   Serial.println(numSensors); 
   for (int i = 0; i < numSensors; i++) {
     double val = getSensorVal(i);
+    Serial.println();
     cycleData[i] = val;
   }
 
@@ -157,6 +158,7 @@ double DataLogger::getSensorVal(int index) {
   switch(sensorType) {
     case 0: //thermocouple
       return getThermoVal(sensorSubIndex);
+      
       break;
     case 1: //30psi pressure sensor
       return getPrVal(sensorSubIndex, 30);
@@ -193,7 +195,10 @@ double DataLogger::getSensorVal(int index) {
 }
 
 double DataLogger::getThermoVal(int subIndex) {
-  return thermocouples[subIndex].readCelsius();
+  double temp_value = thermocouples[subIndex].readCelsius();
+  Serial.print("Thermo ");
+  Serial.print(temp_value); 
+  return temp_value;
 }
 
 //this could be made more generalized

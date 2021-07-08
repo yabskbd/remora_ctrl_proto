@@ -28,6 +28,64 @@
 #include "uFire_SHT20.h"
 #include "SHT1x.h"
 
+/*! MAX Sensor Counts */
+#define MAX_EGT_SENSORS                8
+#define MAX_PR0_30_SENSORS             5
+#define MAX_PR0_2K_SENSORS             0
+
+#define MAX_SHT10_SENSORS              2
+#define MAX_SHT20_SENSORS              0
+
+
+
+
+/*! Pin Mappings */
+
+/* Thermocouple Serial Pins for CLK, CS, DO */
+
+#define EGT_CLK_0       8
+#define EGT_DO_0        9
+
+/* Update to use new GPIO Pins */
+#define EGT_CLK_1       8
+#define EGT_DO_1        9
+
+
+#define EGT_CS_0             10
+#define EGT_CS_1             11
+#define EGT_CS_2             12
+#define EGT_CS_3             13
+#define EGT_CS_4             22
+#define EGT_CS_5             23
+#define EGT_CS_6             24
+#define EGT_CS_7             25
+#define EGT_CS_8             9
+
+
+/* Humidity Sensor SH1x CLK and DO Pin (PWM) */
+#define SH1X_CLK_0            2
+#define SH1X_DO_0             3
+
+#define SH1X_CLK_1            4
+#define SH1X_DO_1             5
+
+#define SH1X_CLK_2            6
+#define SH1X_DO_2             7
+
+
+/*! ADC Max Resolution in bits
+    For Arduino ref: https://www.arduino.cc/reference/en/language/functions/analog-io/analogread/ 
+    Mega Resolution is 10bits i.e 0 - 1023 */
+#define ADC_MAX_RESOLUTION_IN_BITS     10
+
+/*! Temprature Range Scaling */
+#define MAX_TEMP_C_DEGREE      500
+#define MIN_TEMP_C_DEGREE      0
+
+/*! Max Sensor Defination */
+#define MAX_NUM_TEMP 11
+#define MAX_NUM_PSI   5
+#define DATA_LOG_BUF_SIZE (MAX_TEMP + MAX_PSI)
 
 //////////////////////////////////////////////////////////////////////////////////////
 //Variables
@@ -68,15 +126,25 @@ class DataLogger {
     bool initSEN0220();
     RTC_PCF8523 rtc;
     uFire_SHT20 sht20;
-    Adafruit_MAX31855 thermocouples[8] = {Adafruit_MAX31855(8, 10, 9), Adafruit_MAX31855(8, 11, 9), Adafruit_MAX31855(8, 12, 9), Adafruit_MAX31855(8, 13, 9),
-                                           Adafruit_MAX31855(8, 22, 9), Adafruit_MAX31855(8, 23, 9), Adafruit_MAX31855(8, 24, 9), Adafruit_MAX31855(8, 25, 9)};
-    SHT1x sht10s[3] = {SHT1x(2,3), SHT1x(4,5), SHT1x(6,7)};
+    Adafruit_MAX31855 thermocouples[MAX_EGT_SENSORS] = {Adafruit_MAX31855(EGT_CLK_0, EGT_CS_0, EGT_DO_0), 
+                                          Adafruit_MAX31855(EGT_CLK_0, EGT_CS_1, EGT_DO_0), 
+                                          Adafruit_MAX31855(EGT_CLK_0, EGT_CS_2, EGT_DO_0), 
+                                          Adafruit_MAX31855(EGT_CLK_0, EGT_CS_3, EGT_DO_0),
+                                          Adafruit_MAX31855(EGT_CLK_0, EGT_CS_4, EGT_DO_0), 
+                                          Adafruit_MAX31855(EGT_CLK_0, EGT_CS_5, EGT_DO_0), 
+                                          Adafruit_MAX31855(EGT_CLK_0, EGT_CS_6, EGT_DO_0), 
+                                          Adafruit_MAX31855(EGT_CLK_0, EGT_CS_7, EGT_DO_0)};
+    /* Humidity Sensor Info */
+    SHT1x sht10s[3] = {SHT1x(SH1X_CLK_0,SH1X_DO_0), 
+                       SHT1x(SH1X_CLK_1,SH1X_DO_1), 
+                       SHT1x(SH1X_CLK_2,SH1X_DO_2)};
+    
     int matchAnalogPinToID[7] = {A0, A1, A2, A3, A4, A5, A6};
     int indexTracker[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; //compiled list of number of each type of sensor [numKType,numPr30Sen,numPr2kSen,numSHT20,numSEN0220,...]
     int numSensors; //double counts the SHT20
     int numKType; //number of K type thermocouple
     int numPr30Sen; //number of 30PSI analog pressure sensors
-    int numPr2kSen; //number of 30PSI analog pressure sensors
+    int numPr2kSen; //number of 2KPSI analog pressure sensors
     int numSHT20; //number of temperature/humidity sensors
     int numSHT10;
     int numSEN0220; //number of 5% CO2 sensors
@@ -92,7 +160,7 @@ class DataLogger {
 
 
 //create DataLogger object
-DataLogger dataLog(8, 5, 0, 2, 1, 0, false); //(thermocouples, 30psi pressure, SHT20, SHT10, SEN0220, stage #, should it preheat for 3 minutes?)
+DataLogger dataLog(MAX_EGT_SENSORS, MAX_PR0_30_SENSORS, MAX_SHT20_SENSORS, MAX_SHT10_SENSORS, 1, 0, false); //(thermocouples, 30psi pressure, SHT20, SHT10, SEN0220, stage #, should it preheat for 3 minutes?)
 
 //filename for the SD card
 String file;
@@ -113,7 +181,6 @@ long lastSensorCheck = 0;
 //2 = desorption
 //3 = precooling
 byte stage = 0;
-
 
 
 //////////////////////////////////////////////////////////////////////////////////////
@@ -228,7 +295,7 @@ void loop() {
 //////////////////////////////////////////////////////////////////////////////////////
 void initSD() {
   int initTime = 5;
-
+#if 0
   for (int i = 0; i < initTime; i++) {
     Serial.print(initTime - i);
     Serial.println(" second(s) remain for SD reader initialization");
@@ -240,6 +307,7 @@ void initSD() {
     // don't do anything more:
     errorState();
   }
+  #endif 
 }
 
 //stores data after every sensor sweep
@@ -249,7 +317,8 @@ void storeData() {
   Serial.println(data);
   Serial.print("file = ");
   Serial.println(file);
-
+  Serial1.println(data);
+#if 0
   while(file == "") {
     file = createFileName();
   }
@@ -274,6 +343,7 @@ void storeData() {
   else {
     Serial.println("Data storage failed.");
   }
+#endif 
 }
 
 String createFileName() {
@@ -296,6 +366,7 @@ String createFileName() {
 }
 
 void errorState() {
+  /* Todo Flash an LED */
   while (1) {
     delay(1000);
   }
