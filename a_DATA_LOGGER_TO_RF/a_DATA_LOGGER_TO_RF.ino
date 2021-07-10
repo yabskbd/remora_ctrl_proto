@@ -27,6 +27,26 @@
 #include "Adafruit_MAX31855.h"
 #include "uFire_SHT20.h"
 #include "SHT1x.h"
+#define __ASSERT_USE_STDERR // Define ASSERT Internally 
+#include <assert.h>
+
+void __assert(const char *__func, const char *__file, int __lineno, const char *__sexp)
+{
+    // transmit diagnostic informations through serial link.
+    Serial.println("--------------------------------ERROR ASSERT------------------------");
+    Serial.println(__file);
+    Serial.println(__func);
+    Serial.print("Line Number: ");
+    Serial.println(__lineno, DEC);
+    Serial.println(__sexp);
+    Serial.flush();
+    // abort program execution.
+    abort();
+}
+
+/*! Remove def for prodcution code 
+    Todo define production #define */
+#define ASSERT(x)
 
 /*! MAX Sensor Counts */
 #define MAX_EGT_SENSORS                8
@@ -77,12 +97,14 @@
     For Arduino ref: https://www.arduino.cc/reference/en/language/functions/analog-io/analogread/ 
     Mega Resolution is 10bits i.e 0 - 1023 */
 #define ADC_MAX_RESOLUTION_IN_BITS     10
+#define ADC_MAX_RESOULTION             ((1 << ADC_MAX_RESOLUTION_IN_BITS) - 1)
 
 /*! Temprature Range Scaling */
 #define MAX_TEMP_C_DEGREE      500
 #define MIN_TEMP_C_DEGREE      0
 
 /*! Max Sensor Defination */
+#define SENSOR_SWEEP_INTERVAL_IN_MS    5000
 #define MAX_NUM_TEMP 11
 #define MAX_NUM_PSI   5
 #define DATA_LOG_BUF_SIZE (MAX_TEMP + MAX_PSI)
@@ -126,18 +148,18 @@ class DataLogger {
     bool initSEN0220();
     RTC_PCF8523 rtc;
     uFire_SHT20 sht20;
-    Adafruit_MAX31855 thermocouples[MAX_EGT_SENSORS] = {Adafruit_MAX31855(EGT_CLK_0, EGT_CS_0, EGT_DO_0), 
-                                          Adafruit_MAX31855(EGT_CLK_0, EGT_CS_1, EGT_DO_0), 
-                                          Adafruit_MAX31855(EGT_CLK_0, EGT_CS_2, EGT_DO_0), 
-                                          Adafruit_MAX31855(EGT_CLK_0, EGT_CS_3, EGT_DO_0),
-                                          Adafruit_MAX31855(EGT_CLK_0, EGT_CS_4, EGT_DO_0), 
-                                          Adafruit_MAX31855(EGT_CLK_0, EGT_CS_5, EGT_DO_0), 
-                                          Adafruit_MAX31855(EGT_CLK_0, EGT_CS_6, EGT_DO_0), 
-                                          Adafruit_MAX31855(EGT_CLK_0, EGT_CS_7, EGT_DO_0)};
+    int thermocouples[MAX_EGT_SENSORS] = {A0, 
+                                          A1, 
+                                          A2, 
+                                          A3,
+                                          A4, 
+                                          A5, 
+                                          A6, 
+                                          A7};
     /* Humidity Sensor Info */
-    SHT1x sht10s[3] = {SHT1x(SH1X_CLK_0,SH1X_DO_0), 
-                       SHT1x(SH1X_CLK_1,SH1X_DO_1), 
-                       SHT1x(SH1X_CLK_2,SH1X_DO_2)};
+    SHT1x sht10s[3] = {SHT1x(SH1X_DO_0,SH1X_CLK_0), 
+                       SHT1x(SH1X_DO_1,SH1X_CLK_1), 
+                       SHT1x(SH1X_DO_2,SH1X_CLK_2)};
     
     int matchAnalogPinToID[7] = {A0, A1, A2, A3, A4, A5, A6};
     int indexTracker[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; //compiled list of number of each type of sensor [numKType,numPr30Sen,numPr2kSen,numSHT20,numSEN0220,...]
@@ -225,10 +247,6 @@ const int chipSelect = 53;
 //////////////////////////////////////////////////////////////////////////////////////
 
 void setup() {
-  while (!Serial) {
-    delay(1);
-  }
-
   //might have to jump from 9600 to 19200 for the RF to work
   Serial.begin(9600);
   Serial1.begin(9600);
@@ -263,30 +281,21 @@ void setup() {
 //////////////////////////////////////////////////////////////////////////////////////
 
 void loop() {
-  //find and set the local time
-  localTime = millis();
 
-  //determines period of sensor data
-  //at some point, the response time of the sensors means that going faster doesn't matter
-  if (localTime - lastSensorCheck >= T) {
-    lastSensorCheck = localTime;
+  //looks at every sensor value
+  Serial.println("beginning sweep");
+  dataLog.sweep();
 
-    //looks at every sensor value
-    Serial.println("beginning sweep");
-    dataLog.sweep();
+  //sends data to SD card and prints to Serial
+  Serial.println("storing data");
+  storeData();
 
-    //sends data to SD card and prints to Serial
-    Serial.println("storing data");
-    storeData();
+  //could do stuff here if interested in a particular sensor value result
+  Serial.println("assessing data");
+  dataLog.assess();
 
-    //could do stuff here if interested in a particular sensor value result
-    Serial.println("assessing data");
-    dataLog.assess();
+  delay(SENSOR_SWEEP_INTERVAL_IN_MS); //helps with stability
 
-    delay(1); //helps with stability
-  }
-
-  Serial.println("new loop");
 
 }
 
@@ -363,6 +372,17 @@ String createFileName() {
   Serial.println(partial);
 
   return partial;
+}
+
+/*! Input adc_raw_value and the Min & Max of the Range of the particular unit of interest. 
+    Returns the value within range for the respective adc_val 
+    Required: min_range < max_range */
+double adc_range_based_interpreter(int adc_val, double min_range, double max_range) {
+
+  double total_range = max_range - min_range;
+  ASSERT(max_range > min_range);
+  return ((((double)adc_val/ADC_MAX_RESOULTION) * (total_range)) + min_range);
+
 }
 
 void errorState() {

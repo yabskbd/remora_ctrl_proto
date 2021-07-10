@@ -69,7 +69,7 @@ bool DataLogger::initialize() {
 bool DataLogger::initRTC() {
   Serial.println("Initializing RTC...");
 
-  int initTime = 3;
+  int initTime = 0;
 
   for (int i = 0; i < initTime; i++) {
     Serial.print(initTime - i);
@@ -94,15 +94,10 @@ bool DataLogger::initRTC() {
 }
 
 bool DataLogger::initSensors() {
-  //initialize the thermocouples
-  for (int i = 0; i < numKType; i++) {
-    while (!thermocouples[i].begin()) {
-      delay(50);
-    }
-  }
-
-  //no need to initialize the pressure sensors
-
+    
+  // No Init for Pressure sensor as its ADC
+  // No Init for Thermocouples as its ADC
+  
   //init SHT20
   Wire.begin();
   sht20.begin();
@@ -195,10 +190,11 @@ double DataLogger::getSensorVal(int index) {
 }
 
 double DataLogger::getThermoVal(int subIndex) {
-  double temp_value = thermocouples[subIndex].readCelsius();
+  int adc_val = analogRead(thermocouples[subIndex]);
+  double temp_in_c = adc_range_based_interpreter(adc_val, MIN_TEMP_C_DEGREE, MAX_TEMP_C_DEGREE);
   Serial.print("Thermo ");
-  Serial.print(temp_value); 
-  return temp_value;
+  Serial.print(temp_in_c); 
+  return temp_in_c;
 }
 
 //this could be made more generalized
@@ -229,7 +225,10 @@ double DataLogger::getSHT20DewPoint(int subIndex) {
 }
 
 double DataLogger::getSHT10Humidity(int subIndex) {
-  return sht10s[subIndex].readHumidity();
+  double hum_val = sht10s[subIndex].readHumidity();
+  Serial.print("HUM10: ");
+  Serial.println(hum_val);
+  return hum_val;
 }
 
 double DataLogger::getSHT10Temperature(int subIndex) {
