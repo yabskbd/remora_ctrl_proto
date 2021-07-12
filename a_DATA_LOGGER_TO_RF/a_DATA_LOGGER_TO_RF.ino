@@ -21,48 +21,118 @@
 //////////////////////////////////////////////////////////////////////////////////////
 //LIBRARIES
 //////////////////////////////////////////////////////////////////////////////////////
+#include <Arduino.h>
 #include <SPI.h>
 #include <SD.h>
 #include <RTClib.h>
+
+
 #include "Adafruit_MAX31855.h"
 #include "uFire_SHT20.h"
 #include "SHT1x.h"
+#include "mcp2515_can.h"
 #define __ASSERT_USE_STDERR // Define ASSERT Internally 
 #include <assert.h>
 
+
+/*! Remove def for prodcution code 
+    Todo define production #define */
+
+#define Sprintln_HIGH(a)          (Serial.println(a))
+#define Sprint_HIGH(a)            (Serial.print(a))
+#define Sprint_ext_HIGH(a, b)     (Serial.print(a, b))
+
+
+
+#if 0
+#define Sprintln(a)          (Serial.println(a))
+#define Sprint(a)            (Serial.print(a))
+#define Sprint_ext(a, b)     (Serial.print(a, b))
+
+#define ASSERT(x)            assert(x)
+
+#else
+
+#define Sprintln(a) 
+#define Sprint(a)  
+#define Sprint_ext(a, b)
+
+#define ASSERT(x)
+
+#endif
+/* -------------------------------------------------------------------------------------------------------------------*/
+/*! Assert Handler */
 void __assert(const char *__func, const char *__file, int __lineno, const char *__sexp)
 {
     // transmit diagnostic informations through serial link.
-    Serial.println("--------------------------------ERROR ASSERT------------------------");
-    Serial.println(__file);
-    Serial.println(__func);
+    Sprint("--------------------------------ERROR ASSERT------------------------");
+    Sprint(__file);
+    Sprint(__func);
     Serial.print("Line Number: ");
-    Serial.println(__lineno, DEC);
-    Serial.println(__sexp);
+    Sprint_ext(__lineno, DEC);
+    Sprint(__sexp);
     Serial.flush();
     // abort program execution.
     abort();
 }
 
-/*! Remove def for prodcution code 
-    Todo define production #define */
-#define ASSERT(x)
 
+
+/* --------------------------------------------------CAN BUS----------------------------------------------------------*/
+
+/*! CAN Bus Definitions */
+// For Arduino MCP2515 Hat:
+// the cs pin of the version after v1.1 is default to D9
+// v0.9b and v1.0 is default D10
+#define SPI_CS_PIN            9
+#define CAN_BAUD_RATE_0       CAN_500KBPS
+mcp2515_can CAN(SPI_CS_PIN);
+
+
+/* EGT CAN ID Def. */ 
+#define EGT_CAN_ID_0_1             0x100
+#define EGT_CAN_ID_2_3             0x101
+#define EGT_CAN_ID_4_5             0x102
+#define EGT_CAN_ID_6_7             0x103
+
+#define EGT_CAN_ID_8_9             0x104
+#define EGT_CAN_ID_10_11           0x105
+#define EGT_CAN_ID_12_13           0x106
+#define EGT_CAN_ID_14_15           0x107
+
+
+#define EGT_CAN_ID_0             EGT_CAN_ID_0_1
+#define EGT_CAN_ID_1             EGT_CAN_ID_0_1
+#define EGT_CAN_ID_2             EGT_CAN_ID_2_3
+#define EGT_CAN_ID_3             EGT_CAN_ID_2_3
+#define EGT_CAN_ID_4             EGT_CAN_ID_4_5
+#define EGT_CAN_ID_5             EGT_CAN_ID_4_5
+#define EGT_CAN_ID_6             EGT_CAN_ID_6_7
+#define EGT_CAN_ID_7             EGT_CAN_ID_6_7
+#define EGT_CAN_ID_8             EGT_CAN_ID_8_9
+#define EGT_CAN_ID_9             EGT_CAN_ID_8_9
+#define EGT_CAN_ID_10            EGT_CAN_ID_10_11
+#define EGT_CAN_ID_11            EGT_CAN_ID_10_11
+#define EGT_CAN_ID_12            EGT_CAN_ID_12_13
+#define EGT_CAN_ID_13            EGT_CAN_ID_12_13
+#define EGT_CAN_ID_14            EGT_CAN_ID_14_15
+#define EGT_CAN_ID_15            EGT_CAN_ID_14_15
+
+
+/* --------------------------------------------------Sensor Max Value Definitions----------------------------------------------------------*/
+
+/*! Max Definitions */
 /*! MAX Sensor Counts */
 #define MAX_EGT_SENSORS                8
 #define MAX_PR0_30_SENSORS             5
 #define MAX_PR0_2K_SENSORS             0
 
-#define MAX_SHT10_SENSORS              2
+#define MAX_SHT10_SENSORS              0
 #define MAX_SHT20_SENSORS              0
 
-
-
-
+/* -------------------------------------------------------------------------------------------------------------------*/
 /*! Pin Mappings */
-
 /* Thermocouple Serial Pins for CLK, CS, DO */
-
 #define EGT_CLK_0       8
 #define EGT_DO_0        9
 
@@ -92,6 +162,7 @@ void __assert(const char *__func, const char *__file, int __lineno, const char *
 #define SH1X_CLK_2            6
 #define SH1X_DO_2             7
 
+/* -------------------------------------------------------------------------------------------------------------------*/
 
 /*! ADC Max Resolution in bits
     For Arduino ref: https://www.arduino.cc/reference/en/language/functions/analog-io/analogread/ 
@@ -103,8 +174,8 @@ void __assert(const char *__func, const char *__file, int __lineno, const char *
 #define MAX_TEMP_C_DEGREE      500
 #define MIN_TEMP_C_DEGREE      0
 
-/*! Max Sensor Defination */
-#define SENSOR_SWEEP_INTERVAL_IN_MS    5000
+/*! Max Sensor Definitions */
+#define SENSOR_SWEEP_INTERVAL_IN_MS    100
 #define MAX_NUM_TEMP 11
 #define MAX_NUM_PSI   5
 #define DATA_LOG_BUF_SIZE (MAX_TEMP + MAX_PSI)
@@ -112,6 +183,29 @@ void __assert(const char *__func, const char *__file, int __lineno, const char *
 //////////////////////////////////////////////////////////////////////////////////////
 //Variables
 //////////////////////////////////////////////////////////////////////////////////////
+
+typedef struct
+{
+  double data[MAX_EGT_SENSORS];
+  
+}rmu_ctrl_sensors_thermo_s;
+
+
+typedef struct
+{
+  double data[MAX_EGT_SENSORS];
+}rmu_ctrl_sensors_pressure_s;
+
+
+typedef struct
+{
+
+  rmu_ctrl_sensors_pressure_s       egp;
+  rmu_ctrl_sensors_thermo_s         egt;
+  
+}rmu_ctrl_sensors_s;
+
+rmu_ctrl_sensors_s rmu_ctrl_sensors;
 
 class DataLogger {
   public: //accessible from anywhere
@@ -252,26 +346,32 @@ void setup() {
   Serial1.begin(9600);
   Serial2.begin(9600);
 
-  Serial.println("Welcome to a_DATA_LOGGER_TO_RF");
+  Sprint("Welcome to a_DATA_LOGGER_TO_RF");
 
-  Serial.println("Serials initialized");
+  Sprint("Serials initialized");
 
-  //dataLog = new DataLogger(16,5,1,1,1,0,false);
-
-  Serial.println("Data object created");
-
-  //the RF sensor shouldn't need to be initialized
+  while (CAN_OK != CAN.begin(CAN_BAUD_RATE_0)) 
+  {    
+    // init can bus : baudrate = 500k
+    Sprint("CAN init fail, retry...");
+    delay(100);
+  }
+  Sprint("CAN init success.. baud_rate: ");
+  Sprintln(CAN_BAUD_RATE_0);
+  
+  //TODO create RF_INIT 
+  // the RF sensor shouldn't need to be initialized
 
   //init SDcard
-  initSD();
+ initSD();
 
   //if major item can't be initialized, then error out
   if (!dataLog.initialize()) {
-    Serial.println("Init Error");
+    Sprint("Init Error");
     errorState();
   }
 
-  Serial.println("done with startup");
+  Sprint("done with startup");
 
   //starts loop of sensor data gathering
 }
@@ -283,19 +383,46 @@ void setup() {
 void loop() {
 
   //looks at every sensor value
-  Serial.println("beginning sweep");
+  Sprint("beginning sweep");
   dataLog.sweep();
 
   //sends data to SD card and prints to Serial
-  Serial.println("storing data");
+  Sprint("storing data");
   storeData();
 
   //could do stuff here if interested in a particular sensor value result
-  Serial.println("assessing data");
+  Sprint("assessing data");
   dataLog.assess();
 
   delay(SENSOR_SWEEP_INTERVAL_IN_MS); //helps with stability
 
+  /* Fetch CAN BUS Data */
+  // variables used for CAN messages
+  unsigned char len = 0;
+  unsigned char buf[8];
+   while(CAN_MSGAVAIL == CAN.checkReceive())            // check if data coming
+    {
+      CAN.readMsgBuf(&len, buf);    // read data,  len: data length, buf: data buf
+
+      unsigned long canId = CAN.getCanId();            // get CAN id to match to task
+
+      switch(canId)
+      {
+        // Control for Throttle Servo //////////
+        case EGT_CAN_ID_0_1:  
+        case EGT_CAN_ID_2_3: 
+        case EGT_CAN_ID_4_5: 
+        case EGT_CAN_ID_6_7: 
+        case EGT_CAN_ID_8_9: 
+        case EGT_CAN_ID_10_11:
+        case EGT_CAN_ID_12_13:
+        case EGT_CAN_ID_14_15:
+        {
+          break;
+        }
+      }
+
+    }
 
 }
 
@@ -307,12 +434,12 @@ void initSD() {
 #if 0
   for (int i = 0; i < initTime; i++) {
     Serial.print(initTime - i);
-    Serial.println(" second(s) remain for SD reader initialization");
+    Sprint(" second(s) remain for SD reader initialization");
     delay(1000);
   }
   
   if (!SD.begin(chipSelect)) { //consider setting pin 53 as output HIGH and/or creating a 0 bit file on the card
-    Serial.println("Card failed, or not present");
+    Sprint("Card failed, or not present");
     // don't do anything more:
     errorState();
   }
@@ -322,10 +449,10 @@ void initSD() {
 //stores data after every sensor sweep
 void storeData() {
   String data = dataLog.getCycleDataAsString();
-  Serial.print("data = ");
-  Serial.println(data);
-  Serial.print("file = ");
-  Serial.println(file);
+  Sprint("data = ");
+  Sprintln(data);
+  Sprint("file = ");
+  Sprintln(file);
   Serial1.println(data);
 #if 0
   while(file == "") {
@@ -339,7 +466,7 @@ void storeData() {
   delay(10);
 
   if (!dataFile) {
-    Serial.println("File opening failed.");
+    Sprint("File opening failed.");
   }
 
   //print cycleOutput to serial (RF) and SD card
@@ -350,7 +477,7 @@ void storeData() {
     dataFile.close();
   }
   else {
-    Serial.println("Data storage failed.");
+    Sprint("Data storage failed.");
   }
 #endif 
 }
@@ -368,8 +495,8 @@ String createFileName() {
   partial += full[14];
   partial += full[15];
   partial += ".txt";
-  Serial.print("File name is ");
-  Serial.println(partial);
+  Sprint("File name is ");
+  Sprint(partial);
 
   return partial;
 }

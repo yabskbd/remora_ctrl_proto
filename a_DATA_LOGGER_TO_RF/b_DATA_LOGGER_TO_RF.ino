@@ -58,7 +58,7 @@ bool DataLogger::initialize() {
     return false;
   }
 
-  Serial.println("inited sensors");
+  Sprint("inited sensors");
 
   pinMode(fanPin, OUTPUT);
   pinMode(heaterPin, OUTPUT);
@@ -67,26 +67,26 @@ bool DataLogger::initialize() {
 }
 
 bool DataLogger::initRTC() {
-  Serial.println("Initializing RTC...");
+  Sprint("Initializing RTC...");
 
   int initTime = 0;
 
   for (int i = 0; i < initTime; i++) {
-    Serial.print(initTime - i);
-    Serial.println(" second(s) remain for RTC initialization");
+    Sprint(initTime - i);
+    Sprint(" second(s) remain for RTC initialization");
     delay(1000);
   }
 
   if (! rtc.begin()) {
-    Serial.println("Couldn't find RTC");
-    Serial.println("keep going even though it's a bad idea");
+    Sprint("Couldn't find RTC");
+    Sprint("keep going even though it's a bad idea");
     //Serial.flush();
     //abort();
   }
 
   if (rtc.now().year() > 2100) {
-    Serial.println("RTC isn't communicating properly.");
-    Serial.println("keep going even though it's a bad idea");
+    Sprint("RTC isn't communicating properly.");
+    Sprint("keep going even though it's a bad idea");
     //return false;
   }
 
@@ -105,26 +105,26 @@ bool DataLogger::initSensors() {
   //init SEN0220
   initSEN0220();
 
-  Serial.println("done preheating");
+  Sprint("done preheating");
 
   return true;
 }
 
 bool DataLogger::initSEN0220() {
   /*
-  Serial.println(numKType);
-  Serial.println(numPr30Sen);
-  Serial.println(numSensors);
-  Serial.println(preheat);
+  Sprint(numKType);
+  Sprint(numPr30Sen);
+  Sprint(numSensors);
+  Sprint(preheat);
   */
   if (!preheat) {
-    Serial.println("Opted for no preheating.");
+    Sprint("Opted for no preheating.");
     return true;
   }
   for (int i = 0; i < preheatTime; i++) {
-    Serial.println("Pre-heating in progress.");
-    Serial.print(preheatTime - i);
-    Serial.println(" second(s) remain.");
+    Sprint("Pre-heating in progress.");
+    Sprint(preheatTime - i);
+    Sprint(" second(s) remain.");
     delay(1000);
   }
 
@@ -134,21 +134,27 @@ bool DataLogger::initSEN0220() {
 //looks at each sensor and records a sensor value
 //sends to a string (cycleOutput) for printing and an array (cycleData) for storage
 void DataLogger::sweep() {
-  Serial.print("Number of sensors: ");
-  Serial.println(numSensors); 
+  Sprint("Number of sensors: ");
+  Sprint(numSensors); 
   for (int i = 0; i < numSensors; i++) {
     double val = getSensorVal(i);
-    Serial.println();
+//    Sprint_HIGH("@ sensor, time : ");
+//    Sprint_HIGH(i);
+//    Sprint_HIGH(" , ");
+//    Sprintln_HIGH(millis());
     cycleData[i] = val;
   }
 
 }
 
 double DataLogger::getSensorVal(int index) {
+ 
   delay(5); //this prevents the sensors from being skipped (led to the output "0" error from the thermocouples)
 
   int sensorType = indexToSensorType(index); //TODO convert to byte
   int sensorSubIndex = indexToSensorSubIndex(index);
+//  Sprint_HIGH("SensorType: ");
+//  Sprintln_HIGH(sensorType);
 
   switch(sensorType) {
     case 0: //thermocouple
@@ -192,8 +198,8 @@ double DataLogger::getSensorVal(int index) {
 double DataLogger::getThermoVal(int subIndex) {
   int adc_val = analogRead(thermocouples[subIndex]);
   double temp_in_c = adc_range_based_interpreter(adc_val, MIN_TEMP_C_DEGREE, MAX_TEMP_C_DEGREE);
-  Serial.print("Thermo ");
-  Serial.print(temp_in_c); 
+  Sprint("Thermo ");
+  Sprint(temp_in_c); 
   return temp_in_c;
 }
 
@@ -226,8 +232,8 @@ double DataLogger::getSHT20DewPoint(int subIndex) {
 
 double DataLogger::getSHT10Humidity(int subIndex) {
   double hum_val = sht10s[subIndex].readHumidity();
-  Serial.print("HUM10: ");
-  Serial.println(hum_val);
+  Sprint("HUM10: ");
+  Sprint(hum_val);
   return hum_val;
 }
 
@@ -241,42 +247,13 @@ double DataLogger::getSHT10DewPoint(int subIndex) {
   double t = sht10s[subIndex].readTemperatureC();
   double rh = sht10s[subIndex].readHumidity();
   double dp = t - ((100.0-rh)/5.0);
-  Serial.print("dew point is: ");
-  Serial.println(dp);
+  Sprint("dew point is: ");
+  Sprint(dp);
   return dp;
 }
 
 double DataLogger::getSEN0220Val(int subIndex) {
-  Serial2.write(hexdata, 9);
-  delay(500);
-
-  for (int i = 0, j = 0; i < 9; i++)
-  {
-    //Serial.println("Getting Data");
-
-    if (Serial2.available() > 0)
-    {
-      long hi, lo, CO2;
-      int ch = Serial2.read();
-
-      if (i == 2) {
-        hi = ch;    //High concentration
-      }
-      if (i == 3) {
-        lo = ch;    //Low concentration
-      }
-      if (i == 8) {
-        CO2 = hi * 256 + lo; //CO2 concentration
-        Serial.print("CO2 concentration: ");
-        Serial.print(CO2);
-        Serial.println("ppm");
-        return CO2;
-      }
-    }
-  }
-
   return -2.0;
-
 }
 
 double DataLogger::getSEN0220Error(double value) {
@@ -312,8 +289,8 @@ String DataLogger::getRTCValue() {
   data += "s";
   data += SS;
 
-  Serial.print("the getRTCValue is ");
-  Serial.println(data);
+  Sprint("the getRTCValue is ");
+  Sprint(data);
 
   return data;
 }
@@ -342,7 +319,9 @@ String DataLogger::getCycleDataAsString() {
   //add time in milliseconds to start of string
   push = String(millis());
   push += ",";
-
+  Sprint_HIGH(" millisec @ sweep: ");
+  Sprintln_HIGH(push);
+  
   for(int i = 0; i < numSensors; i++) {
     push += cycleData[i];
     if(i < numSensors - 1) {
@@ -412,52 +391,52 @@ void DataLogger::assessSensor(int index) {
   switch(indexToSensorType(index)) {
     case 0: //thermocouple
       if(cycleData[index] > 400) {
-        Serial.print("Thermocouple ");
-        Serial.print(indexToSensorSubIndex(index));
-        Serial.println(" is greater than 400 C");
+        Sprint("Thermocouple ");
+        Sprint(indexToSensorSubIndex(index));
+        Sprint(" is greater than 400 C");
       }
       break;
     case 1: //30psi pressure sensors
       if(cycleData[index] > 25) {
-        Serial.print("30 psi Pressure Sensor");
-        Serial.print(indexToSensorSubIndex(index));
-        Serial.println(" is greater than 25 psi");
+        Sprint("30 psi Pressure Sensor");
+        Sprint(indexToSensorSubIndex(index));
+        Sprint(" is greater than 25 psi");
       }
       break;
     case 2: //2kpsi pressure sensors
       if(cycleData[index] > 1800) {
-        Serial.print("2000 psi Pressure Sensor");
-        Serial.print(indexToSensorSubIndex(index));
-        Serial.println(" is greater than 1800 psi");
+        Sprint("2000 psi Pressure Sensor");
+        Sprint(indexToSensorSubIndex(index));
+        Sprint(" is greater than 1800 psi");
       }
       break;
     case 3: //SHT20 humidity
       if(cycleData[index] > 90) {
-        Serial.print("SHT20 Sensor");
-        Serial.println(" is above 90 percent humidity");
+        Sprint("SHT20 Sensor");
+        Sprint(" is above 90 percent humidity");
       }
       break;
     case 4: //SHT20 temperature
       if(cycleData[index] > 400) {
-        Serial.print("SHT20 Sensor");
-        Serial.println(" is greater than 400 C");
+        Sprint("SHT20 Sensor");
+        Sprint(" is greater than 400 C");
       }
       break;
     case 6: //SHT10 humidity
       if(cycleData[index] > 90) {
-        Serial.print("SHT10 Sensor");
-        Serial.println(" is above 90 percent humidity");
+        Sprint("SHT10 Sensor");
+        Sprint(" is above 90 percent humidity");
       }
       break;
     case 7: //SHT10 temperature
       if(cycleData[index] > 400) {
-        Serial.print("SHT10 Sensor");
-        Serial.println(" is greater than 400 C");
+        Sprint("SHT10 Sensor");
+        Sprint(" is greater than 400 C");
       }
       break;
     case 9: //SEN0220
       if(cycleData[index] > 4500) {
-        Serial.println("Approaching Max CO2 concentration");
+        Sprint("Approaching Max CO2 concentration");
       }
       break;
   }
