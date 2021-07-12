@@ -31,7 +31,7 @@ mcp2518fd CAN(SPI_CS_PIN); // Set CS pin
 #endif
 
 #ifdef CAN_2515
-#include "mcp2515_can.h"
+#include <mcp2515_can.h>
 mcp2515_can CAN(SPI_CS_PIN); // Set CS pin
 #endif                           
 
