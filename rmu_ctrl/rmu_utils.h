@@ -1,5 +1,5 @@
-#ifndef RMU_CTRL
-#define RMU_CTRL
+#ifndef RMU_UTILS
+#define RMU_UTILS
 
 //////////////////////////////////////////////////////////////////////////////////////
 //NOTES
@@ -24,9 +24,50 @@
 //////////////////////////////////////////////////////////////////////////////////////
 //LIBRARIES
 //////////////////////////////////////////////////////////////////////////////////////
+#define __ASSERT_USE_STDERR // Define ASSERT Internally 
+#include <assert.h>
+#include <SPI.h>
+
+#define TRUE                     1
+#define FALSE                    0
+
+
+
+/*! Remove def for prodcution code 
+    Todo define production #define */
+
+#define Sprintln_HIGH(a)          (Serial.println(a))
+#define Sprint_HIGH(a)            (Serial.print(a))
+#define Sprint_ext_HIGH(a, b)     (Serial.print(a, b))
+
+
+
+#if TRUE
+#define Sprintln(a)            (Serial.println(a))
+#define Sprint(a)              (Serial.print(a))
+#define Sprint_ext(a, b)       (Serial.print(a, b))
+#define Sprintln_ext(a, b)     (Serial.println(a, b))
+
+#define ASSERT(x)            assert(x)
+#else /* Production Remove all Asserts and Prints */
+#define Sprintln(a) 
+#define Sprint(a)  
+#define Sprint_ext(a, b)
+#define Sprintln_ext(a, b) 
+
+#define ASSERT(x)
+#endif
 
 
 
 
+/*! Assert Handler */
+void __assert(const char *__func, const char *__file, int __lineno, const char *__sexp);
+
+
+/*! Input adc_raw_value and the Min & Max of the Range of the particular unit of interest. 
+    Returns the value within range for the respective adc_val 
+    Required: min_range < max_range */
+double adc_range_based_interpreter(int adc_val, double min_range, double max_range);
 
 #endif

@@ -8,6 +8,14 @@
 //there is also a more complicated way to do this via inheritance
 
 //creates an instance of the class
+
+/* RMU Libraries */
+#include <Arduino.h>
+#include <RTClib.h>
+#include "rmu_utils.h"
+#include "rmu_ctrl_log.h"
+#include "rmu_ctrl_defs.h"
+
 DataLogger::DataLogger(int nKType, int nPr30Sen, int nSHT20, int nSHT10, int nSEN0220, int initialStage, bool preheatInput) {
   this->numKType = nKType;
   indexTracker[0] = nKType;
@@ -67,26 +75,26 @@ bool DataLogger::initialize() {
 }
 
 bool DataLogger::initRTC() {
-  Sprint("Initializing RTC...");
+  Sprintln("Initializing RTC...");
 
   int initTime = 0;
 
   for (int i = 0; i < initTime; i++) {
     Sprint(initTime - i);
-    Sprint(" second(s) remain for RTC initialization");
+    Sprintln(" second(s) remain for RTC initialization");
     delay(1000);
   }
 
   if (! rtc.begin()) {
-    Sprint("Couldn't find RTC");
-    Sprint("keep going even though it's a bad idea");
+    Sprintln("Couldn't find RTC");
+    Sprintln("keep going even though it's a bad idea");
     //Serial.flush();
     //abort();
   }
 
   if (rtc.now().year() > 2100) {
-    Sprint("RTC isn't communicating properly.");
-    Sprint("keep going even though it's a bad idea");
+    Sprintln("RTC isn't communicating properly.");
+    Sprintln("keep going even though it's a bad idea");
     //return false;
   }
 
@@ -98,14 +106,7 @@ bool DataLogger::initSensors() {
   // No Init for Pressure sensor as its ADC
   // No Init for Thermocouples as its ADC
   
-  //init SHT20
-  Wire.begin();
-  sht20.begin();
-
-  //init SEN0220
-  initSEN0220();
-
-  Sprint("done preheating");
+  Sprintln("done preheating");
 
   return true;
 }
@@ -135,7 +136,7 @@ bool DataLogger::initSEN0220() {
 //sends to a string (cycleOutput) for printing and an array (cycleData) for storage
 void DataLogger::sweep() {
   Sprint("Number of sensors: ");
-  Sprint(numSensors); 
+  Sprintln(numSensors); 
   for (int i = 0; i < numSensors; i++) {
     double val = getSensorVal(i);
 //    Sprint_HIGH("@ sensor, time : ");
@@ -167,27 +168,6 @@ double DataLogger::getSensorVal(int index) {
     case 2: //2,000psi pressure sensor
       return getPrVal(sensorSubIndex, 2000);
       break;
-    case 3: //SHT humidity
-      return getSHT20Humidity(sensorSubIndex);
-      break;
-    case 4: //SHT20 temperature
-      return getSHT20Temperature(sensorSubIndex);
-      break;
-    case 5: //SHT20 dew point
-      return getSHT20DewPoint(sensorSubIndex);
-      break;
-    case 6: //SHT10 humidity
-      return getSHT10Humidity(sensorSubIndex);
-      break;
-    case 7: //SHT10 humidity
-      return getSHT10Temperature(sensorSubIndex);
-      break;
-    case 8: //SHT10 dew point
-      return getSHT10DewPoint(sensorSubIndex);
-      break;
-    case 9: //get SEN0220 carbon in ppm
-      return getSEN0220Val(sensorSubIndex);
-      break;
     default:
       return -1;
       break;
@@ -199,7 +179,7 @@ double DataLogger::getThermoVal(int subIndex) {
   int adc_val = analogRead(thermocouples[subIndex]);
   double temp_in_c = adc_range_based_interpreter(adc_val, MIN_TEMP_C_DEGREE, MAX_TEMP_C_DEGREE);
   Sprint("Thermo ");
-  Sprint(temp_in_c); 
+  Sprintln(temp_in_c); 
   return temp_in_c;
 }
 
@@ -212,52 +192,6 @@ double DataLogger::getPrVal(int subIndex, int maxVal) {
   }
   input = input - 0.5;
   return (maxVal * input / 4.0);
-}
-
-double DataLogger::getSHT20Humidity(int subIndex) {
-  sht20.measure_all();
-  return sht20.RH;
-}
-
-double DataLogger::getSHT20Temperature(int subIndex) {
-  sht20.measure_all();
-  return sht20.tempC;
-}
-
-//I'm having trouble finding the implementation of the .dew_pointC functionality
-double DataLogger::getSHT20DewPoint(int subIndex) {
-  sht20.measure_all();
-  return sht20.dew_pointC;
-}
-
-double DataLogger::getSHT10Humidity(int subIndex) {
-  double hum_val = sht10s[subIndex].readHumidity();
-  Sprint("HUM10: ");
-  Sprint(hum_val);
-  return hum_val;
-}
-
-double DataLogger::getSHT10Temperature(int subIndex) {
-  return sht10s[subIndex].readTemperatureC();
-}
-
-//dew point calculation from here https://iridl.ldeo.columbia.edu/dochelp/QA/Basic/dewpoint.html
-//only accurate at high humidity (within 5 degC of dew point)
-double DataLogger::getSHT10DewPoint(int subIndex) {
-  double t = sht10s[subIndex].readTemperatureC();
-  double rh = sht10s[subIndex].readHumidity();
-  double dp = t - ((100.0-rh)/5.0);
-  Sprint("dew point is: ");
-  Sprint(dp);
-  return dp;
-}
-
-double DataLogger::getSEN0220Val(int subIndex) {
-  return -2.0;
-}
-
-double DataLogger::getSEN0220Error(double value) {
-  return 50 + (0.05 * value);
 }
 
 //retrieves and formats the RTC value as a string
@@ -290,7 +224,7 @@ String DataLogger::getRTCValue() {
   data += SS;
 
   Sprint("the getRTCValue is ");
-  Sprint(data);
+  Sprintln(data);
 
   return data;
 }
@@ -319,8 +253,6 @@ String DataLogger::getCycleDataAsString() {
   //add time in milliseconds to start of string
   push = String(millis());
   push += ",";
-  Sprint_HIGH(" millisec @ sweep: ");
-  Sprintln_HIGH(push);
   
   for(int i = 0; i < numSensors; i++) {
     push += cycleData[i];
@@ -441,3 +373,4 @@ void DataLogger::assessSensor(int index) {
       break;
   }
 }
+
