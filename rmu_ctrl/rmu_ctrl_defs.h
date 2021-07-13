@@ -44,9 +44,15 @@
 
 /*! Max Definitions */
 /*! MAX Sensor Counts */
+
+/*! Exhaust Gas Temprature Sensors */
 #define MAX_EGT_SENSORS                16
-#define MAX_PR0_30_SENSORS             5
-#define MAX_PR0_2K_SENSORS             0
+
+/*! Exhaust Gas Preassure Sensors */
+#define MAX_EGP_NEG15_15_SENSORS                2
+#define MAX_EPG_30_SENSORS                      3
+#define MAX_EGP_2K_SENSORS                      3
+#define MAX_EGP_SENSORS                         (MAX_EGP_NEG15_15_SENSORS + MAX_EPG_30_SENSORS + MAX_EGP_2K_SENSORS)
 
 #define MAX_SHT10_SENSORS              0
 #define MAX_SHT20_SENSORS              0

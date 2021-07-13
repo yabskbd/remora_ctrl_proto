@@ -35,8 +35,6 @@ long last_sensor_sweep_ms = 0;
 //3 = precooling
 byte stage = 0;
 
-//create DataLogger object
-DataLogger dataLog(0, MAX_PR0_30_SENSORS, MAX_SHT20_SENSORS, MAX_SHT10_SENSORS, 1, 0, false); //(thermocouples, 30psi pressure, SHT20, SHT10, SEN0220, stage #, should it preheat for 3 minutes?)
 
 mcp2515_can CAN(SPI_CS_PIN);
 
@@ -71,12 +69,6 @@ void setup() {
 
   //init SDcard
  initSD();
-
-  //if major item can't be initialized, then error out
-  if (!dataLog.initialize()) {
-    Sprintln("Init Error");
-    errorState();
-  }
 
   Sprintln("done with startup");
 
@@ -153,7 +145,8 @@ void schedule_sweep()
 
   //looks at every sensor value
   Sprintln("beginning sweep");
-
+  rmu_ctrl_sensors_egp_fetch_data();
+  
   //sends data to SD card and prints to Serial
   Sprintln("storing data");
   storeData();
@@ -200,13 +193,18 @@ void storeData() {
 
   /* Collect EGT Sensors */
   for(int egt_cnt = 0; egt_cnt < MAX_EGT_SENSORS; egt_cnt++) {
-    hdr  += "EGT_" + String(egt_cnt) + ",";
+    hdr  += "EGT_in_C_" + String(egt_cnt) + ",";
     data += ctrl_sensors_ptr->egt_info.data[egt_cnt];
     data += ",";
   }
 
   /* Collect EGP Sensors */
-
+  for(int egp_cnt = 0; egp_cnt < MAX_EGP_SENSORS; egp_cnt++)
+  {
+    hdr  += "EPT_in_PSI_" + String(egp_cnt) + ",";
+    data += ctrl_sensors_ptr->egp_info.data[egp_cnt];
+    data += ",";
+  }
   /* Send to RF */
   Sprintln(hdr);
   Sprintln(data);
@@ -236,8 +234,6 @@ void storeData() {
   else {
     Sprint("Data storage failed.");
   }
-#endif 
-}
 
 String createFileName() {
   String full = dataLog.getRTCValue();
@@ -257,6 +253,11 @@ String createFileName() {
 
   return partial;
 }
+
+#endif 
+}
+
+
 
 void errorState() {
   /* Todo Flash an LED */
