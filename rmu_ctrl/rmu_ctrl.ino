@@ -26,7 +26,7 @@ const int T = 2000;
 long localTime = 0;
 
 //stores time of most recent sensor sweep in ms; won't be accurate for the first sweep
-long lastSensorCheck = 0;
+long last_sensor_sweep_ms = 0;
 
 //stage in sorption cycle
 //0 = adsorption
@@ -54,6 +54,8 @@ void setup() {
   Sprintln("Welcome to a_DATA_LOGGER_TO_RF");
 
   Sprintln("Serials initialized");
+
+  last_sensor_sweep_ms = millis();
 
   while (CAN_OK != CAN.begin(CAN_BAUD_RATE)) 
   {    
@@ -89,20 +91,12 @@ void loop() {
 
   /* Fetch CAN BUS Data */
   fetch_canbus_data();
-
-  //looks at every sensor value
-  Sprintln("beginning sweep");
-  dataLog.sweep();
-
-  //sends data to SD card and prints to Serial
-  Sprintln("storing data");
-  storeData();
-
-  //could do stuff here if interested in a particular sensor value result
-  Sprintln("assessing data");
-  dataLog.assess();
-
-  delay(SENSOR_SWEEP_INTERVAL_IN_MS); //helps with stability
+  uint32_t curr_ms = millis();
+  if(( curr_ms - last_sensor_sweep_ms) > T)
+  {
+    schedule_sweep();
+    last_sensor_sweep_ms = curr_ms;
+  }
 
 }
 
@@ -154,6 +148,19 @@ void fetch_canbus_data()
 }
 
 
+void schedule_sweep()
+{
+
+  //looks at every sensor value
+  Sprintln("beginning sweep");
+
+  //sends data to SD card and prints to Serial
+  Sprintln("storing data");
+  storeData();
+
+}
+
+
 void initSD() {
   int initTime = 5;
 #if 0
@@ -173,11 +180,36 @@ void initSD() {
 
 //stores data after every sensor sweep
 void storeData() {
-  String data = dataLog.getCycleDataAsString();
-  Sprint("data = ");
+
+  rmu_ctrl_sensors_s * ctrl_sensors_ptr = rmu_ctrl_sensors_get_ptr();
+
+  String data = "";
+  String hdr  = "";
+
+  //add date and time to start of string
+  // TODO fix RTC
+#if 0
+  hdr  += "RTC_VALUE,";
+  data += getRTCValue();
+  data += ",";
+#endif 
+  //add time in milliseconds to start of string
+  hdr  += "MILLIS,";
+  data  += String(millis());
+  data  += ",";
+
+  /* Collect EGT Sensors */
+  for(int egt_cnt = 0; egt_cnt < MAX_EGT_SENSORS; egt_cnt++) {
+    hdr  += "EGT_" + String(egt_cnt) + ",";
+    data += ctrl_sensors_ptr->egt_info.data[egt_cnt];
+    data += ",";
+  }
+
+  /* Collect EGP Sensors */
+
+  /* Send to RF */
+  Sprintln(hdr);
   Sprintln(data);
-  Sprint("file = ");
-  Sprintln(file);
   Serial1.println(data);
 #if 0
   while(file == "") {

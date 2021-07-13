@@ -44,7 +44,7 @@
 
 /*! Max Definitions */
 /*! MAX Sensor Counts */
-#define MAX_EGT_SENSORS                8
+#define MAX_EGT_SENSORS                16
 #define MAX_PR0_30_SENSORS             5
 #define MAX_PR0_2K_SENSORS             0
 
@@ -96,7 +96,12 @@
 #define MIN_TEMP_C_DEGREE      0
 
 /*! Max Sensor Definitions */
-#define SENSOR_SWEEP_INTERVAL_IN_MS    0
+#define RMU_CTRL_DEF_ONE_SEC_IN_MICRO_SEC      1000000
+
+#define RMU_CTRL_DEF_SENSOR_SWEEP_INTERVAL     2*RMU_CTRL_DEF_ONE_SEC_IN_MICRO_SEC
+
+
+
 #define MAX_NUM_TEMP 11
 #define MAX_NUM_PSI   5
 #define DATA_LOG_BUF_SIZE (MAX_TEMP + MAX_PSI)
