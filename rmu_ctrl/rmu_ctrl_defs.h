@@ -54,9 +54,9 @@
 #define MAX_EGP_2K_SENSORS                      0
 #define MAX_EGP_SENSORS                         (MAX_EGP_NEG15_15_SENSORS + MAX_EPG_30_SENSORS + MAX_EGP_2K_SENSORS)
 
-#define MAX_SHT10_SENSORS              0
-#define MAX_SHT20_SENSORS              0
+#define RMU_CTRL_DEFS_MAX_EGH_SENSORS           1
 
+#define RMU_CTRL_DEFS_MAX_FAN                   1
 /* -------------------------------------------------------------------------------------------------------------------*/
 /*! Pin Mappings */
 /* Thermocouple Serial Pins for CLK, CS, DO */
@@ -80,8 +80,8 @@
 
 
 /* Humidity Sensor SH1x CLK and DO Pin (PWM) */
-#define SH1X_CLK_0            2
-#define SH1X_DO_0             3
+#define SH1X_CLK_0            6
+#define SH1X_DO_0             7
 
 #define SH1X_CLK_1            4
 #define SH1X_DO_1             5
@@ -89,6 +89,8 @@
 #define SH1X_CLK_2            6
 #define SH1X_DO_2             7
 
+/*! Fan Digital PIN In */
+#define RMU_CTRL_DEFS_FAN_DI_0   32
 /* -------------------------------------------------------------------------------------------------------------------*/
 
 /*! ADC Max Resolution in bits

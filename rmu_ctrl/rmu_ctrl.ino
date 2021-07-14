@@ -20,7 +20,13 @@ String file;
 
 //time in ms between each round of sensor readings
 //will run into issues if kept on for more than 40 days
-const int T = 3000;
+#define RMU_CTRL_SWEEP_INTERNVAL_IN_MS_0 6000
+
+#define RMU_CTRL_SWEEP_INTERNVAL_IN_MS_1 (RMU_CTRL_SWEEP_INTERNVAL_IN_MS_0/2)
+
+
+static uint32_t curr_sweep_internval = 0;
+
 
 //time since start in ms
 long localTime = 0;
@@ -34,6 +40,9 @@ long last_sensor_sweep_ms = 0;
 //2 = desorption
 //3 = precooling
 byte stage = 0;
+
+static bool is_first_run = TRUE;
+
 
 
 mcp2515_can CAN(SPI_CS_PIN);
@@ -52,6 +61,8 @@ void setup() {
   Sprintln("Welcome to a_DATA_LOGGER_TO_RF");
 
   Sprintln("Serials initialized");
+  
+  rmu_ctrl_sesnors_init();
 
   last_sensor_sweep_ms = millis();
 
@@ -66,9 +77,9 @@ void setup() {
   
   //TODO create RF_INIT 
   // the RF sensor shouldn't need to be initialized
-
+  pinMode(RMU_CTRL_DEFS_FAN_DI_0, INPUT);    // sets the digital FAN PIN as input
   //init SDcard
- initSD();
+  initSD();
 
   Sprintln("done with startup");
 
@@ -84,10 +95,21 @@ void loop() {
   /* Fetch CAN BUS Data */
   fetch_canbus_data();
   uint32_t curr_ms = millis();
-  if(( curr_ms - last_sensor_sweep_ms) > T)
+
+  if(( curr_ms - last_sensor_sweep_ms) > curr_sweep_internval)
   {
     schedule_sweep();
     last_sensor_sweep_ms = curr_ms;
+
+    if(curr_sweep_internval > RMU_CTRL_SWEEP_INTERNVAL_IN_MS_1)
+    {
+      curr_sweep_internval = RMU_CTRL_SWEEP_INTERNVAL_IN_MS_1;
+    }
+    else
+    {
+      curr_sweep_internval = RMU_CTRL_SWEEP_INTERNVAL_IN_MS_0;
+    }
+    
   }
 
 }
@@ -145,7 +167,8 @@ void schedule_sweep()
 
   //looks at every sensor value
   Sprintln("beginning sweep");
-  rmu_ctrl_sensors_egp_fetch_data();
+
+  rmu_ctrl_sensors_sweep();
   
   //sends data to SD card and prints to Serial
   Sprintln("storing data");
@@ -175,7 +198,7 @@ void initSD() {
 void storeData() {
 
   rmu_ctrl_sensors_s * ctrl_sensors_ptr = rmu_ctrl_sensors_get_ptr();
-
+  
   String data = "";
   String hdr  = "";
 
@@ -192,22 +215,43 @@ void storeData() {
   data  += ",";
 
   /* Collect EGT Sensors */
-  for(int egt_cnt = 0; egt_cnt < MAX_EGT_SENSORS; egt_cnt++) {
-    hdr  += "EGT_in_C_" + String(egt_cnt) + ",";
+  for(uint32_t egt_cnt = 0; egt_cnt < MAX_EGT_SENSORS; egt_cnt++) {
+    hdr  += "EGT_C_" + String(egt_cnt) + ",";
     data += ctrl_sensors_ptr->egt_info.data[egt_cnt];
     data += ",";
   }
 
   /* Collect EGP Sensors */
-  for(int egp_cnt = 0; egp_cnt < MAX_EGP_SENSORS; egp_cnt++)
+  for(uint32_t egp_cnt = 0; egp_cnt < MAX_EGP_SENSORS; egp_cnt++)
   {
-    hdr  += "EPT_in_PSI_" + String(egp_cnt) + ",";
+    hdr  += "EGP_PSI_" + String(egp_cnt) + ",";
     data += ctrl_sensors_ptr->egp_info.data[egp_cnt];
     data += ",";
   }
+/*
+  for(uint32_t egh_cnt = 0; egh_cnt < RMU_CTRL_DEFS_MAX_EGH_SENSORS; egh_cnt++)
+  {
+    hdr  += "EGH_in_HUM_" + String(egh_cnt) + ",";
+    data += ctrl_sensors_ptr->egh_info.data[egh_cnt].humidity;
+    data += ",";
+
+    hdr  += "EGH_in_Thermo_C_" + String(egh_cnt) + ",";
+    data += ctrl_sensors_ptr->egh_info.data[egh_cnt].thermo;
+    data += ",";
+  }
+   hdr += "Fan_0";
+   data += ctrl_sensors_ptr->fan_data[0];
+  */
   /* Send to RF */
   Sprintln(hdr);
   Sprintln(data);
+  
+  if(is_first_run)
+  {
+    Serial1.println(hdr);
+    is_first_run = FALSE;
+  }
+  
   Serial1.println(data);
 #if 0
   while(file == "") {

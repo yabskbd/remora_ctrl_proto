@@ -7,15 +7,67 @@
 rmu_ctrl_sensors_s   rmu_ctrl_sensors;
 rmu_ctrl_sensors_s * rmu_ctrl_sensors_ptr = &rmu_ctrl_sensors;
 
+// Specify data and clock connections and instantiate SHT1x object
+#define clockPin 6 //yellow
+#define dataPin  7 //black
+
+SHT1x sht1x(dataPin, clockPin);
+
+
+void rmu_ctrl_sesnors_init()
+{
+  memset(rmu_ctrl_sensors_ptr, 0x0, sizeof(rmu_ctrl_sensors_s));
+}
+
+
+void rmu_ctrl_sensors_sweep()
+{
+
+  rmu_ctrl_sensors_egp_fetch_data();
+  rmu_ctrl_sensors_egh_fetch_data();
+ // rmu_ctrl_sensors_ptr->fan_data[0] = digitalRead(RMU_CTRL_DEFS_FAN_DI_0);
+  
+
+}
+
+void rmu_ctrl_sensors_egh_fetch_data()
+{
+#if 0
+  rmu_ctrl_sensors_humidity_s * egh_info_ptr = &(rmu_ctrl_sensors_ptr->egh_info);
+  double hum_val, thermo_val;
+
+
+  float temp_c;
+  float temp_f;
+  float humidity;
+
+  // Read values from the sensor
+  temp_c = sht1x.readTemperatureC();
+  humidity = sht1x.readHumidity();
+
+  // Print the values to the serial port
+  Serial.print("Temperature: ");
+  Serial.print(temp_c, DEC);
+  Serial.print("C / ");
+
+  Serial.print(humidity);
+  Serial.println("%");
+
+  egh_info_ptr->data[0].humidity    = humidity;
+  egh_info_ptr->data[0].thermo      = temp_c;
+    
+#endif
+}
+
 void rmu_ctrl_sensors_egp_fetch_data()
 {
-  rmu_ctrl_sensors_pressure_s * ept_info_ptr = &(rmu_ctrl_sensors_ptr->egp_info);
+  rmu_ctrl_sensors_pressure_s * egp_info_ptr = &(rmu_ctrl_sensors_ptr->egp_info);
   int adc_pin, adc_val;
   double gague_psi;
   
-  for (int ept_tbl_idx = 0; ept_tbl_idx < MAX_EGP_SENSORS; ++ept_tbl_idx)
+  for (uint32_t ept_tbl_idx = 0; ept_tbl_idx < MAX_EGP_SENSORS; ++ept_tbl_idx)
   {
-    adc_pin = ept_info_ptr->egp_adc_pin[ept_tbl_idx];
+    adc_pin = egp_info_ptr->adc_pins_tbl[ept_tbl_idx];
     adc_val = analogRead(adc_pin);
 
     if(ept_tbl_idx < MAX_EGP_NEG15_15_SENSORS)
@@ -31,7 +83,7 @@ void rmu_ctrl_sensors_egp_fetch_data()
       gague_psi = adc_range_based_interpreter(adc_val, 0, 2000);
     }
 
-    ept_info_ptr->data[ept_tbl_idx] = gague_psi;
+    egp_info_ptr->data[ept_tbl_idx] = gague_psi;
   }
 
 }
