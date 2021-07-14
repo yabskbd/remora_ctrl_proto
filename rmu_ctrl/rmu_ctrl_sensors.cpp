@@ -32,7 +32,7 @@ void rmu_ctrl_sensors_sweep()
 
 void rmu_ctrl_sensors_egh_fetch_data()
 {
-#if 0
+#if 1
   rmu_ctrl_sensors_humidity_s * egh_info_ptr = &(rmu_ctrl_sensors_ptr->egh_info);
   double hum_val, thermo_val;
 

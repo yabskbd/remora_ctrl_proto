@@ -228,7 +228,7 @@ void storeData() {
     data += ctrl_sensors_ptr->egp_info.data[egp_cnt];
     data += ",";
   }
-/*
+
   for(uint32_t egh_cnt = 0; egh_cnt < RMU_CTRL_DEFS_MAX_EGH_SENSORS; egh_cnt++)
   {
     hdr  += "EGH_in_HUM_" + String(egh_cnt) + ",";
@@ -241,7 +241,7 @@ void storeData() {
   }
    hdr += "Fan_0";
    data += ctrl_sensors_ptr->fan_data[0];
-  */
+
   /* Send to RF */
   Sprintln(hdr);
   Sprintln(data);
