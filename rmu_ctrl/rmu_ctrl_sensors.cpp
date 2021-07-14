@@ -24,7 +24,7 @@ void rmu_ctrl_sensors_egp_fetch_data()
     }
     else if(ept_tbl_idx < MAX_EPG_30_SENSORS)
     {
-      gague_psi = adc_range_based_interpreter(adc_val, -15, 15);
+      gague_psi = adc_range_based_interpreter(adc_val, 0, 30);
     }
     else if(ept_tbl_idx < MAX_EGP_2K_SENSORS)
     {

@@ -36,8 +36,8 @@
 #define ADC_MAX_RESOULTION             ((1 << ADC_MAX_RESOLUTION_IN_BITS) - 1)
 
 /*! Temprature Range Scaling */
-#define MIN_PSI      -14.7
-#define MAX_PSI       15
+#define MIN_PSI      0
+#define MAX_PSI      30
 
 
 

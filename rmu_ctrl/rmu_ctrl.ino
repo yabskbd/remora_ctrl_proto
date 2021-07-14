@@ -20,7 +20,7 @@ String file;
 
 //time in ms between each round of sensor readings
 //will run into issues if kept on for more than 40 days
-const int T = 2000;
+const int T = 3000;
 
 //time since start in ms
 long localTime = 0;

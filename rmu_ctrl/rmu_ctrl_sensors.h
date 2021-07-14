@@ -24,8 +24,9 @@ typedef struct
                                       A3,
                                       A4, 
                                       A5, 
-                                      A6, 
-                                      A7}; 
+                                      A7, 
+                                      A8,
+                                      A9}; 
 }rmu_ctrl_sensors_pressure_s;
 
 
