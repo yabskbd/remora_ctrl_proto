@@ -37,18 +37,30 @@
 #endif
 
 
+#undef RMU_UTILS_EN_LP_PRINT
+#define RMU_UTILS_EN_HP_PRINT
+
+
+
+#define Sprintln_Output_Debug(a)            (Serial.println(a))
 
 
 /*! Remove def for prodcution code 
     Todo define production #define */
+#ifdef RMU_UTILS_EN_HP_PRINT
+#define Sprintln_HP(a)            (Serial.println(a))
+#define Sprint_HP(a)              (Serial.print(a))
+#define Sprint_ext_HP(a, b)       (Serial.print(a, b))
+#define Sprintln_ext_HP(a, b)     (Serial.println(a, b))
+#else
+#define Sprintln_HP(a)         
+#define Sprint_HP(a)           
+#define Sprint_ext_HP(a, b)    
+#define Sprintln_ext_HP(a, b)  
+#endif
 
-#define Sprintln_HIGH(a)          (Serial.println(a))
-#define Sprint_HIGH(a)            (Serial.print(a))
-#define Sprint_ext_HIGH(a, b)     (Serial.print(a, b))
 
-
-
-#if TRUE
+#ifdef RMU_UTILS_EN_LP_PRINT
 #define Sprintln(a)            (Serial.println(a))
 #define Sprint(a)              (Serial.print(a))
 #define Sprint_ext(a, b)       (Serial.print(a, b))

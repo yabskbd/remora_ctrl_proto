@@ -10,9 +10,13 @@
 
 #define RMU_CTRL_SENSORS_EGT_CAN_DATA_SCALING        100.0
 
+#define RMU_CTRL_SENSORS_EGT_ALL_RECV_BMSK           ((1 << MAX_EGT_SENSORS) - 1)
+
 typedef struct
 {
   double data[MAX_EGT_SENSORS];
+  uint32_t recv_egt_bmsk;
+  
 }rmu_ctrl_sensors_thermo_s;
 
 
@@ -69,7 +73,7 @@ typedef struct
 void rmu_ctrl_sesnors_init();
 
 
-void rmu_ctrl_sensors_sweep();
+int rmu_ctrl_sensors_sweep();
 
 void rmu_ctrl_sensors_egh_fetch_data();
 
@@ -78,6 +82,9 @@ void rmu_ctrl_sensors_egp_fetch_data();
 
 
 void rmu_ctrl_sensors_parse_egt_data(uint32_t can_id, uint32_t len, uint8_t * buf);
+
+void rmu_ctrl_sensors_store_egt_data(uint32_t can_id, uint32_t len, uint8_t * buf);
+
 
 
 rmu_ctrl_sensors_s * rmu_ctrl_sensors_get_ptr();

@@ -43,6 +43,7 @@ byte stage = 0;
 
 static bool is_first_run = TRUE;
 
+static uint8_t  can_data_buf[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
 
 mcp2515_can CAN(SPI_CS_PIN);
@@ -94,23 +95,7 @@ void loop() {
 
   /* Fetch CAN BUS Data */
   fetch_canbus_data();
-  uint32_t curr_ms = millis();
-
-  if(( curr_ms - last_sensor_sweep_ms) > curr_sweep_internval)
-  {
-    schedule_sweep();
-    last_sensor_sweep_ms = curr_ms;
-
-    if(curr_sweep_internval > RMU_CTRL_SWEEP_INTERNVAL_IN_MS_1)
-    {
-      curr_sweep_internval = RMU_CTRL_SWEEP_INTERNVAL_IN_MS_1;
-    }
-    else
-    {
-      curr_sweep_internval = RMU_CTRL_SWEEP_INTERNVAL_IN_MS_0;
-    }
-    
-  }
+  schedule_sweep();
 
 }
 
@@ -126,21 +111,23 @@ void fetch_canbus_data()
   uint8_t  len = 0;
   while(CAN_MSGAVAIL == CAN.checkReceive())            // check if data coming
   {
-    uint8_t  can_data_buf[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+
     CAN.readMsgBuf(&len, can_data_buf);    // read data,  len: data length, buf: data buf
     
     unsigned long can_id = CAN.getCanId();            // get CAN id to match to task
     
-    Sprintln("-----------------------------");
-    Sprint("Get data from ID: 0x");
-    Sprintln_ext(can_id, HEX);
+    Sprint("-----------------------------");
+    Sprint_HP("Get data from ID: 0x");
+    Sprintln_ext_HP(can_id, HEX);
     
+#ifdef RMU_UTILS_EN_LP_PRINT
     for (int i = 0; i < len; i++) { // print the data
         Sprint_ext(can_data_buf[i], HEX);
         Sprint("\t");
     }
     Sprintln();
-    
+#endif
+
     switch(can_id)
     {
       case EGT_CAN_ID_0_1:  
@@ -165,15 +152,18 @@ void fetch_canbus_data()
 void schedule_sweep()
 {
 
-  //looks at every sensor value
-  Sprintln("beginning sweep");
 
-  rmu_ctrl_sensors_sweep();
+
+  int ret_val_start_store = rmu_ctrl_sensors_sweep();
   
   //sends data to SD card and prints to Serial
-  Sprintln("storing data");
-  storeData();
+  if (ret_val_start_store == TRUE)
+  {
+    Sprintln("storing data");
+      storeData();
 
+  }
+  
 }
 
 
@@ -243,62 +233,15 @@ void storeData() {
    data += ctrl_sensors_ptr->fan_data[0];
 
   /* Send to RF */
-  Sprintln(hdr);
-  Sprintln(data);
-  
   if(is_first_run)
   {
+    Sprintln_Output_Debug(hdr);
     Serial1.println(hdr);
     is_first_run = FALSE;
   }
   
+  Sprintln_Output_Debug(data);
   Serial1.println(data);
-#if 0
-  while(file == "") {
-    file = createFileName();
-  }
-
-  delay(10);
-
-  File dataFile = SD.open(file, FILE_WRITE);
-
-  delay(10);
-
-  if (!dataFile) {
-    Sprint("File opening failed.");
-  }
-
-  //print cycleOutput to serial (RF) and SD card
-  //for this setup, serial messages go through the radio to the computer
-  Serial1.println(data);
-  if (dataFile) {
-    dataFile.println(data);
-    dataFile.close();
-  }
-  else {
-    Sprint("Data storage failed.");
-  }
-
-String createFileName() {
-  String full = dataLog.getRTCValue();
-  String partial = "";
-  //`YYYYoMMdDDhHHmMMsSS`
-  partial += full[5];
-  partial += full[6];
-  partial += full[8];
-  partial += full[9];
-  partial += full[11];
-  partial += full[12];
-  partial += full[14];
-  partial += full[15];
-  partial += ".txt";
-  Sprint("File name is ");
-  Sprintln(partial);
-
-  return partial;
-}
-
-#endif 
 }
 
 
