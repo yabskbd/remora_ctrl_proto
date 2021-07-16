@@ -38,7 +38,7 @@
 
 
 #undef RMU_UTILS_EN_LP_PRINT
-#define RMU_UTILS_EN_HP_PRINT
+#undef RMU_UTILS_EN_HP_PRINT
 
 
 
