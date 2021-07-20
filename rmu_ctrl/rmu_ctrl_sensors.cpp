@@ -61,16 +61,14 @@ void rmu_ctrl_sensors_parse_egt_data(uint32_t can_id, uint32_t len, uint8_t * bu
   uint32_t thermo_data_1 = 0;
 
   ASSERT(len == 8);
-
-  thermo_data_0 = ( (buf[0] << 24) | 
-                    (buf[1] << 16 )| 
-                    (buf[2] << 8) | 
-                    (buf[3]));
+  thermo_data_0 = ( ((uint32_t)(buf[1]) << 16 )| 
+                    ((uint32_t)(buf[2]) << 8 )  | 
+                    ((uint32_t)(buf[3])) );
   
-  thermo_data_1 = ( (buf[4] << 24) | 
-                    (buf[5] << 16 )| 
-                    (buf[6] << 8)  | 
-                    (buf[7]));
+  thermo_data_1 =  ( ((uint32_t)(buf[5]) << 16 )| 
+                     ((uint32_t)(buf[6]) << 8 )  | 
+                     ((uint32_t)(buf[7])) );
+
 
   egt_info_ptr->data[egt_sesnor_id_0] = thermo_data_0 / RMU_CTRL_SENSORS_EGT_CAN_DATA_SCALING;
   egt_info_ptr->data[egt_sensor_id_1] = thermo_data_1 / RMU_CTRL_SENSORS_EGT_CAN_DATA_SCALING;

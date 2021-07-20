@@ -47,11 +47,11 @@ void setup() {
     SERIAL_PORT_MONITOR.println("CAN init ok!");
 }
 
-unsigned char stmp[8] = {0, 0, 0, 0x46, 0, 0, 0, 0x45};
+unsigned char stmp[8] = {0, 0, 0, 0x00, 0, 0, 0, 0x00};
 void loop() {
     // send data:  id = 0x00, standrad frame, data len = 8, stmp: data buf
 
-    
+    stmp[7] += 1;
     CAN.sendMsgBuf(0x08, 0, 8, stmp);
     CAN.sendMsgBuf(0x09, 0, 8, stmp);
     CAN.sendMsgBuf(0x07, 0, 8, stmp);
