@@ -48,6 +48,11 @@ BO_ 3221225472 VECTOR__INDEPENDENT_SIG_MSG: 0 Vector__XXX
  SG_ TireTemp : 0|16@1+ (0.03125,-273) [-273|1734.96875] "deg C" Vector__XXX
  SG_ TirePress : 0|8@1+ (4,0) [0|1000] "kPa" Vector__XXX
  SG_ NewSignal_0006 : 24|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ DTC1 : 16|32@1+ (1,0) [0|4294967295] "" Vector__XXX
+ SG_ DTC2 : 48|32@1+ (1,0) [0|4294967295] "" Vector__XXX
+ SG_ DTC3 : 80|32@1+ (1,0) [0|4294967295] "" Vector__XXX
+ SG_ DTC4 : 112|32@1+ (1,0) [0|4294967295] "" Vector__XXX
+ SG_ DTC5 : 144|32@1+ (1,0) [0|4294967295] "" Vector__XXX
 
 BO_ 2297441790 AccelerationSensor: 7 Vector__XXX
  SG_ SpprtVrblTrnsRpttnRtFrAcclrtnSns : 54|2@1+ (1,0) [0|3] "" Vector__XXX
@@ -4143,7 +4148,7 @@ BO_ 2566837246 DM11: 0 Vector__XXX
 BO_ 2566836990 DM10: 8 Vector__XXX
  SG_ TestIdentifierSupported : 0|64@1+ (1,0) [1|1.8446744074e+19] "" Vector__XXX
 
-BO_ 2566834942 DM1: 22 Vector__XXX
+BO_ 2566834942 DM1: 8 Vector__XXX
  SG_ FlashRedStopLamp : 12|2@1+ (1,0) [0|3] "" Vector__XXX
  SG_ FlashProtectLamp : 8|2@1+ (1,0) [0|3] "" Vector__XXX
  SG_ FlashMalfuncIndicatorLamp : 14|2@1+ (1,0) [0|3] "" Vector__XXX
@@ -4152,11 +4157,6 @@ BO_ 2566834942 DM1: 22 Vector__XXX
  SG_ AmberWarningLampStatus : 2|2@1+ (1,0) [0|3] "" Vector__XXX
  SG_ RedStopLampState : 4|2@1+ (1,0) [0|3] "" Vector__XXX
  SG_ ProtectLampStatus : 0|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ DTC5 : 144|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC4 : 112|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC3 : 80|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC2 : 48|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC1 : 16|32@1+ (1,0) [0|4294967295] "" Vector__XXX
 
 BO_ 2566780926 UTACR: 8 Vector__XXX
  SG_ UtlityOverallPowerFactorLagging : 48|2@1+ (1,0) [0|3] "" Vector__XXX
@@ -4964,6 +4964,10 @@ BO_ 2565877758 AEBS1: 8 Vector__XXX
  SG_ BendOffProbabilityOfRelevantObj : 11|3@1+ (1,0) [0|0] "" Vector__XXX
  SG_ TimeToCollisionWithRelevantObj : 16|8@1+ (1,0) [0|0] "" Vector__XXX
 
+BO_ 256 TMPBB1: 8 Vector__XXX
+ SG_ Themocouple1Temperature : 23|16@0+ (0.01,0) [0|0] "C" Vector__XXX
+ SG_ Themocouple2Temperature : 55|16@0+ (0.01,0) [0|0] "C" Vector__XXX
+
 
 
 CM_ BO_ 3221225472 "This is a message for not used signals, created by Vector CANdb++ DBC OLE DB Provider.";
@@ -4977,6 +4981,11 @@ CM_ SG_ 3221225472 CTITireStatus "Indicates the status of the tire.";
 CM_ SG_ 3221225472 CTIWheelSensorStatus "Indicates whether the wheel is being monitored by the CTI controller.";
 CM_ SG_ 3221225472 TireTemp "Temperature at the surface of the tire sidewall.";
 CM_ SG_ 3221225472 TirePress "Pressure at which air is contained in cavity formed by tire and rim.";
+CM_ SG_ 3221225472 DTC1 "Diagnostic Trouble Code";
+CM_ SG_ 3221225472 DTC2 "Diagnostic Trouble Code";
+CM_ SG_ 3221225472 DTC3 "Diagnostic Trouble Code";
+CM_ SG_ 3221225472 DTC4 "Diagnostic Trouble Code";
+CM_ SG_ 3221225472 DTC5 "Diagnostic Trouble Code";
 CM_ BO_ 2297441790 "The acceleration sensor message shall provide a measurement of the vehicle's acceleration in the lateral, longitudinal,
 and vertical axes.";
 CM_ SG_ 2297441790 SpprtVrblTrnsRpttnRtFrAcclrtnSns "Indicates which acceleration transmission rate are supported by the ECU in addition to the required 10 ms transmission";
@@ -8505,11 +8514,6 @@ not be immediately stopped.";
 CM_ SG_ 2566834942 RedStopLampState "This lamp is uesed to relay trouble code information that is of a severe enought condition that it warrants stopping the vehicle.";
 CM_ SG_ 2566834942 ProtectLampStatus "This lamp is used to relay trouble code informatio that is reporting a problem with a vehicle system that is most
 probably not electronic subsystem related.";
-CM_ SG_ 2566834942 DTC5 "Diagnostic Trouble Code";
-CM_ SG_ 2566834942 DTC4 "Diagnostic Trouble Code";
-CM_ SG_ 2566834942 DTC3 "Diagnostic Trouble Code";
-CM_ SG_ 2566834942 DTC2 "Diagnostic Trouble Code";
-CM_ SG_ 2566834942 DTC1 "Diagnostic Trouble Code";
 CM_ BO_ 2566780926 "Utility Total AC Reactive Power";
 CM_ SG_ 2566780926 UtlityOverallPowerFactorLagging "Lead/lag status for utility incomer average power factor.";
 CM_ SG_ 2566780926 UtilityOverallPowerFactor "The average power factor of the utility incomer.";
@@ -16644,11 +16648,6 @@ BA_ "SPN" SG_ 2566834942 RedStopLampState 623;
 BA_ "SigType" SG_ 2566834942 RedStopLampState 4;
 BA_ "SPN" SG_ 2566834942 ProtectLampStatus 987;
 BA_ "SigType" SG_ 2566834942 ProtectLampStatus 4;
-BA_ "SigType" SG_ 2566834942 DTC5 7;
-BA_ "SigType" SG_ 2566834942 DTC4 7;
-BA_ "SigType" SG_ 2566834942 DTC3 7;
-BA_ "SigType" SG_ 2566834942 DTC2 7;
-BA_ "SigType" SG_ 2566834942 DTC1 7;
 BA_ "GenMsgSendType" BO_ 2566780926 8;
 BA_ "VFrameFormat" BO_ 2566780926 3;
 BA_ "SPN" SG_ 2566780926 UtlityOverallPowerFactorLagging 2522;
@@ -17948,6 +17947,7 @@ BA_ "SPN" SG_ 2565877758 CollisionWarningLevel 5677;
 BA_ "SPN" SG_ 2565877758 RelevantObjectDetectedForAEBS 5678;
 BA_ "SPN" SG_ 2565877758 BendOffProbabilityOfRelevantObj 5679;
 BA_ "SPN" SG_ 2565877758 TimeToCollisionWithRelevantObj 5680;
+BA_ "VFrameFormat" BO_ 256 0;
 BA_ "NmJ1939Function" BU_ Turbocharger 133;
 BA_ "NmStationAddress" BU_ Turbocharger 2;
 BA_ "NmJ1939Function" BU_ OnBoardDataLogger 130;
