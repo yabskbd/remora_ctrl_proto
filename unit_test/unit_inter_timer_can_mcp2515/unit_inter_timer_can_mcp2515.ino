@@ -47,7 +47,6 @@ mcp2518fd CAN(SPI_CS_PIN); // Set CS pin
 #ifdef CAN_2515
 #include "mcp2515_can.h"
 mcp2515_can CAN(SPI_CS_PIN); // Set CS pin
-mcp2515_can CAN2(SPI_CS_PIN2); // Set CS pin
 #define MAX_DATA_SIZE 8
 #endif
 
@@ -83,18 +82,12 @@ void setup() {
      * Now set to CANFD mode.
      */
     CAN.setMode(CAN_NORMAL_MODE);
-    CAN2.setMode(CAN_NORMAL_MODE);
     #endif
 
     while (CAN_OK != CAN.begin(CAN_500KBPS)) {             // init can bus : baudrate = 500k
         SERIAL_PORT_MONITOR.println(F("CAN init fail, retry..."));
         delay(100);
     }
-    while (CAN_OK != CAN2.begin(CAN_500KBPS)) {             // init can bus : baudrate = 500k
-        SERIAL_PORT_MONITOR.println(F("CAN2 init fail, retry..."));
-        delay(100);
-    }
-    SERIAL_PORT_MONITOR.println(F("CAN & CAN2 init ok!"));
 }
 
 uint32_t id;
@@ -144,45 +137,6 @@ void loop() {
         n += sprintf(prbuf + n, "%02X ", cdata[i]);
     }
     SERIAL_PORT_MONITOR.println(prbuf);
-
-    ///////////////////////////////////////////
-    //CAN2
-
-    // check if data coming
-    if (CAN_MSGAVAIL != CAN2.checkReceive()) {
-        return;
-    }
-    
-    t = millis();
-    // read data, len: data length, buf: data buf
-    CAN2.readMsgBuf(&len, cdata);
-
-    id = CAN2.getCanId();
-    type = (CAN2.isExtendedFrame() << 0) |
-           (CAN2.isRemoteRequest() << 1);
-    /*
-     * MCP2515(or this driver) could not handle properly
-     * the data carried by remote frame
-     */
-
-    n = sprintf(prbuf, "%04lu.%03d ", t / 1000, int(t % 1000));
-    /* Displayed type:
-     *
-     * 0x00: standard data frame
-     * 0x02: extended data frame
-     * 0x30: standard remote frame
-     * 0x32: extended remote frame
-     */
-    n += sprintf(prbuf + n, "RX: [%08lX](%02X) ", (unsigned long)id, type2[type]);
-    // n += sprintf(prbuf, "RX: [%08lX](%02X) ", id, type);
-
-    for (i = 0; i < len; i++) {
-        n += sprintf(prbuf + n, "%02X ", cdata[i]);
-    }
-    SERIAL_PORT_MONITOR.print("CAN2: ");
-    SERIAL_PORT_MONITOR.println(prbuf);
-
-    /////////////////////////////////////////////
 }
 
 void scream() {
