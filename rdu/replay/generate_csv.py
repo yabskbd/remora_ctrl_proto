@@ -16,7 +16,7 @@ def get_pgn(frame_id):
 
 def get_all_signals(can_database, pgns_to_include):
     signal_name_to_idx = {} 
-    csv_headers = []
+    csv_headers = ['Time']
     idx = 0
     for message in can_database.messages:
         if message.protocol == 'j1939' and pgns_to_include and get_pgn(message.frame_id) not in pgns_to_include:
@@ -60,11 +60,12 @@ def get_prior_time_bucket(current_message_timestamp, time_bucket):
 
 def print_data_row(bucket_time, signal_name_to_idx, latest_values_by_signal_name):
     row = ['' for idx in range(len(signal_name_to_idx))]
-    row.insert(0, str(bucket_time))
+    row.insert(0, bucket_time.strftime('%Y-%m-%d %H:%M:%S.%f'))
     for signal_name, idx in signal_name_to_idx.items():
         row[idx + 1] = str(latest_values_by_signal_name.get(signal_name, ''))
 
     print(','.join(row))
+
 
 if __name__ == '__main__':
     parser = ArgumentParser(description='Parse CAN dump file into a csv')
@@ -72,14 +73,16 @@ if __name__ == '__main__':
                         dest='time_bucket', type=int, default=1000)
     parser.add_argument('--pgns', help='Which PGNs to include (comma-separated)',
                         dest='pgns', type=str, default=None)
+    parser.add_argument('--input-file', help='A CAN dump file to use as input',
+                        dest='inputfile', type=str, default=None)
     args = parser.parse_args()
     time_bucket = timedelta(milliseconds=args.time_bucket)
     pgns_to_include = set([int(p) for p in args.pgns.split(',')]) if args.pgns else None
 
     try:
-        db = load_file(os.path.join(Path(__file__).parent.resolve(), 'combineddb.dbc'), frame_id_mask=0x00ffff00)
+        db = load_file(os.path.join(Path(__file__).parent.resolve(), 'remora.dbc'), frame_id_mask=0x00ffff00)
     except FileNotFoundError:
-        sys.exit('ERROR: Cannot find Remora.dbc file. It should exist in the same directory as this script')
+        sys.exit('ERROR: Cannot find remora.dbc file. It should exist in the same directory as this script')
 
     can_parser = Parser()
     latest_values_by_signal_name = {}
@@ -90,8 +93,7 @@ if __name__ == '__main__':
 
     first_row = True  # Used for initial time bucketing logic
 
-    for row in ['(1626967626.599931) can1 0CF00400#017D7D000000F07D', ' (1626967587.421626) can1 18FECA00#03FF00000000FFFF']:
-        import pdb; pdb.set_trace()
+    for row in sys.stdin:
         try:
             try:
                 decoded_row = decode_row(row, can_parser)
@@ -109,6 +111,7 @@ if __name__ == '__main__':
 
             for signal_name, signal_value in decoded_row.signal_values.items():
                 latest_values_by_signal_name[signal_name] = signal_value
-        except Exception:
+        except Exception as ex:
+            print(ex)
             print('Error handling row: ' + row)
 
