@@ -8,8 +8,6 @@ from collections import namedtuple
 from datetime import datetime, timedelta
 from pathlib import Path
 
-from time import time
-
 DecodedMessage = namedtuple('DecodedMessage', ['timestamp', 'signal_values'])
 
 def get_pgn(frame_id):
@@ -67,7 +65,6 @@ def print_data_row(bucket_time, signal_name_to_idx, latest_values_by_signal_name
         row[idx + 1] = str(latest_values_by_signal_name.get(signal_name, ''))
 
     print(','.join(row))
-    sys.stdout.flush()
 
 
 if __name__ == '__main__':
