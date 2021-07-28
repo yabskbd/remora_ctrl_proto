@@ -8,6 +8,8 @@ from collections import namedtuple
 from datetime import datetime, timedelta
 from pathlib import Path
 
+from time import time
+
 DecodedMessage = namedtuple('DecodedMessage', ['timestamp', 'signal_values'])
 
 def get_pgn(frame_id):
@@ -65,6 +67,8 @@ def print_data_row(bucket_time, signal_name_to_idx, latest_values_by_signal_name
         row[idx + 1] = str(latest_values_by_signal_name.get(signal_name, ''))
 
     print(','.join(row))
+    sys.stdout.flush()
+
 
 if __name__ == '__main__':
     parser = ArgumentParser(description='Parse CAN dump file into a csv')
@@ -72,6 +76,8 @@ if __name__ == '__main__':
                         dest='time_bucket', type=int, default=1000)
     parser.add_argument('--pgns', help='Which PGNs to include (comma-separated)',
                         dest='pgns', type=str, default=None)
+    parser.add_argument('--input-file', help='A CAN dump file to use as input',
+                        dest='inputfile', type=str, default=None)
     args = parser.parse_args()
     time_bucket = timedelta(milliseconds=args.time_bucket)
     pgns_to_include = set([int(p) for p in args.pgns.split(',')]) if args.pgns else None
