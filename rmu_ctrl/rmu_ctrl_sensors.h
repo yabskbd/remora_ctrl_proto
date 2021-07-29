@@ -12,6 +12,17 @@
 
 #define RMU_CTRL_SENSORS_EGT_ALL_RECV_BMSK           ((1 << MAX_EGT_SENSORS) - 1)
 
+
+enum {
+
+AT_EXHAUST = 0,
+EVAPO,
+
+
+
+
+} rmu_ctrl_senosrs_egt_location;
+
 typedef struct
 {
   double data[MAX_EGT_SENSORS];
