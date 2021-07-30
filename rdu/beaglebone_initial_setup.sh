@@ -53,6 +53,8 @@ sudo ip link set can0 up type can bitrate 250000 listen-only on restart-ms 250
 sudo ifconfig can1 up
 sudo ifconfig can0 up" | sudo tee /usr/bin/beaglebone_can_setup.sh > /dev/null
 
+sudo chmod +x /usr/bin/beaglebone_can_setup.sh
+
 # Create systemd unit file to run CAN setup script on startup
 echo "[Unit]
 Description=Configure CAN buses on system startup
@@ -62,17 +64,47 @@ Type=simple
 ExecStart=/usr/bin/beaglebone_can_setup.sh
 
 [Install]
-WantedBy=multi-user.target" | sudo tee /lib/systemd/system/bonecan.service > /dev/null
+WantedBy=multi-user.target" | sudo tee /lib/systemd/system/canconfigure.service > /dev/null
 
-sudo ln -s /lib/systemd/system/bonecan.service /etc/systemd/system/
+sudo ln -s /lib/systemd/system/canconfigure.service /etc/systemd/system/
 
-sudo systemctl enable bonecan
+# Create CAN logging script
+echo "#!/bin/bash
+candump -tA -L any >> /var/log/candump.log" | sudo tee /usr/bin/beaglebone_can_listen.sh > /dev/null
+
+sudo chmod +x /usr/bin/beaglebone_can_listen.sh
+
+# Create systemd unit file to run CAN logging script on startup, and restart on failure
+echo "[Unit]
+Description=Listens to all CAN buses and logs to a file
+Requires=canconfigure.service
+After=canconfigure.service
+
+StartLimitBurst=10
+StartLimitIntervalSec=3min
+
+[Service]
+Type=simple
+Restart=on-failure
+RestartSec=10s
+ExecStart=/usr/bin/beaglebone_can_listen.sh
+
+[Install]
+WantedBy=multi-user.target" | sudo tee /lib/systemd/system/canlog.service > /dev/null
+
+sudo ln -s /lib/systemd/system/canlog.service /etc/systemd/system/
+
+sudo systemctl enable canconfigure
+sudo systemctl enable canlog
 
 # Install python dependencies globally
 python3 -m pip install wheel
 python3 -m pip install git+https://github.com/eerimoq/cantools.git@3bbc98bd2a9fc2d62979fca0bbf9a6c9b8e84df1#egg=cantools
 sudo mv generate_csv.py /usr/local/bin
 sudo mv remora.dbc /usr/local/bin
+
+# Use handy BeagleBone script to partition disk to full size of SD card
+sudo /opt/scripts/tools/grow_partition.sh
 
 # Update password from default 'temppwd' to provided DEBIAN_USER_PASSWORD
 echo "debian:$DEBIAN_USER_PASSWORD" | sudo chpasswd
