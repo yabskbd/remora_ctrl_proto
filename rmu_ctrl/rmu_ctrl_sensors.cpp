@@ -135,15 +135,15 @@ void rmu_ctrl_sensors_egp_fetch_data()
 
     if(ept_tbl_idx < MAX_EGP_NEG15_15_SENSORS)
     {
-      gague_psi = adc_range_based_interpreter(adc_val, -15, 15);
+      gague_psi = rmu_utils_adc_range_based_interpreter(adc_val, -15, 15, RMU_CTRL_DEFS_EGP_ADC_VAL_OFFSET);
     }
     else if(ept_tbl_idx < MAX_EPG_30_SENSORS)
     {
-      gague_psi = adc_range_based_interpreter(adc_val, 0, 30);
+      gague_psi = rmu_utils_adc_range_based_interpreter(adc_val, 0, 30, RMU_CTRL_DEFS_EGP_ADC_VAL_OFFSET);
     }
     else if(ept_tbl_idx < MAX_EGP_2K_SENSORS)
     {
-      gague_psi = adc_range_based_interpreter(adc_val, 0, 2000);
+      gague_psi = rmu_utils_adc_range_based_interpreter(adc_val, 0, 2000, RMU_CTRL_DEFS_EGP_ADC_VAL_OFFSET);
     }
 
     egp_info_ptr->data[ept_tbl_idx] = gague_psi;

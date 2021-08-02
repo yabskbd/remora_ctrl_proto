@@ -1,6 +1,13 @@
 #ifndef RMU_CTRL_DEFS
 #define RMU_CTRL_DEFS
 
+/*! ADC Max Resolution in bits
+    For Arduino ref: https://www.arduino.cc/reference/en/language/functions/analog-io/analogread/ 
+    Mega Resolution is 10bits i.e 0 - 1023 */
+#define RMU_CTRL_DEFS_MAX_VOLTAGE      4.5
+#define ADC_MAX_RESOLUTION_IN_BITS     10
+#define ADC_MAX_RESOULTION             ((1 << ADC_MAX_RESOLUTION_IN_BITS) - 1)
+
 /* --------------------------------------------------CAN BUS----------------------------------------------------------*/
 
 /*! CAN Bus Definitions */
@@ -56,6 +63,10 @@
 
 #define RMU_CTRL_DEFS_MAX_EGH_SENSORS           1
 
+
+#define RMU_CTRL_DEFS_EGP_OFFSET_VOLTAGE          0.5
+#define RMU_CTRL_DEFS_EGP_ADC_VAL_OFFSET          (double)((RMU_CTRL_DEFS_EGP_OFFSET_VOLTAGE / RMU_CTRL_DEFS_MAX_VOLTAGE ) * ADC_MAX_RESOULTION)
+
 #define RMU_CTRL_DEFS_MAX_FAN                   1
 /* -------------------------------------------------------------------------------------------------------------------*/
 /*! Pin Mappings */
@@ -92,12 +103,6 @@
 /*! Fan Digital PIN In */
 #define RMU_CTRL_DEFS_FAN_DI_0   32
 /* -------------------------------------------------------------------------------------------------------------------*/
-
-/*! ADC Max Resolution in bits
-    For Arduino ref: https://www.arduino.cc/reference/en/language/functions/analog-io/analogread/ 
-    Mega Resolution is 10bits i.e 0 - 1023 */
-#define ADC_MAX_RESOLUTION_IN_BITS     10
-#define ADC_MAX_RESOULTION             ((1 << ADC_MAX_RESOLUTION_IN_BITS) - 1)
 
 /*! Temprature Range Scaling */
 #define MAX_TEMP_C_DEGREE      500
