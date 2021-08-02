@@ -93,7 +93,14 @@ if __name__ == '__main__':
 
     first_row = True  # Used for initial time bucketing logic
 
-    for row in sys.stdin:
+    # While you can simply cat a file and pipe it to this script, pdb sometimes works better if you specify the inputfile in advance
+    if not args.inputfile:
+        rows = sys.stdin
+    else:
+        rows = open(args.inputfile, 'r').readlines()
+
+    for row in rows:
+        row = row.strip()
         try:
             try:
                 decoded_row = decode_row(row, can_parser)
@@ -113,5 +120,4 @@ if __name__ == '__main__':
                 latest_values_by_signal_name[signal_name] = signal_value
         except Exception as ex:
             print(ex)
-            print('Error handling row: ' + row)
-
+            print('Error handling row: ' + repr(row))
