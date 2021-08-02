@@ -106,23 +106,22 @@ void loop() {
 
   ///////////////////////////////////////////////////
   //CAN
-
+  char prbuf[32 + MAX_DATA_SIZE * 3];
+  int i, n;
+  unsigned long t;
+  static const byte type2[] = {0x00, 0x02, 0x30, 0x32};
   
     // check if data coming
-    if (CAN_MSGAVAIL != CAN.checkReceive()) {
-        return;
-    }
-
-    char prbuf[32 + MAX_DATA_SIZE * 3];
-    int i, n;
-
-    unsigned long t = millis();
+    if (CAN_MSGAVAIL == CAN.checkReceive()) {
+        t = millis();
     // read data, len: data length, buf: data buf
     CAN.readMsgBuf(&len, cdata);
 
     id = CAN.getCanId();
     type = (CAN.isExtendedFrame() << 0) |
            (CAN.isRemoteRequest() << 1);
+
+           
     /*
      * MCP2515(or this driver) could not handle properly
      * the data carried by remote frame
@@ -136,7 +135,7 @@ void loop() {
      * 0x30: standard remote frame
      * 0x32: extended remote frame
      */
-    static const byte type2[] = {0x00, 0x02, 0x30, 0x32};
+    
     n += sprintf(prbuf + n, "RX: [%08lX](%02X) ", (unsigned long)id, type2[type]);
     // n += sprintf(prbuf, "RX: [%08lX](%02X) ", id, type);
 
@@ -144,16 +143,14 @@ void loop() {
         n += sprintf(prbuf + n, "%02X ", cdata[i]);
     }
     SERIAL_PORT_MONITOR.println(prbuf);
+    }
 
     ///////////////////////////////////////////
     //CAN2
 
     // check if data coming
-    if (CAN_MSGAVAIL != CAN2.checkReceive()) {
-        return;
-    }
-    
-    t = millis();
+    if (CAN_MSGAVAIL == CAN2.checkReceive()) {
+        t = millis();
     // read data, len: data length, buf: data buf
     CAN2.readMsgBuf(&len, cdata);
 
@@ -181,6 +178,7 @@ void loop() {
     }
     SERIAL_PORT_MONITOR.print("CAN2: ");
     SERIAL_PORT_MONITOR.println(prbuf);
+    }
 
     /////////////////////////////////////////////
 }
