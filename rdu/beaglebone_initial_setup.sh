@@ -11,8 +11,8 @@ for ENV_VAR in BEAGLEBONE_WIFI_PASSWORD DEBIAN_USER_PASSWORD ECHENEIDAE_WIFI_PAS
 done
 
 # Ensure CAN script has been copied, along with dbc database file
-if [[ ! -e generate_csv.py ]]; then
-	echo "Must copy generate_csv.py script over to host"
+if [[ ! -e canparse.py ]]; then
+	echo "Must copy canparse.py script over to host"
 	exit 1;
 fi
 if [[ ! -e remora.dbc ]]; then
@@ -100,8 +100,15 @@ sudo systemctl enable canlog
 # Install python dependencies globally
 python3 -m pip install wheel
 python3 -m pip install git+https://github.com/eerimoq/cantools.git@3bbc98bd2a9fc2d62979fca0bbf9a6c9b8e84df1#egg=cantools
-sudo mv generate_csv.py /usr/local/bin
+
+# Install canparse script
+sudo mv canparse.py /usr/local/bin
 sudo mv remora.dbc /usr/local/bin
+
+echo "#!/bin/bash
+python3 /usr/local/bin/canparse.py \"\$@\"" | sudo tee /usr/local/bin/canparse > /dev/null
+
+sudo chmod +x /usr/local/bin/canparse
 
 # Use handy BeagleBone script to partition disk to full size of SD card
 sudo /opt/scripts/tools/grow_partition.sh
