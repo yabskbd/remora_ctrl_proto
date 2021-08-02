@@ -3,21 +3,25 @@
 # BEAGLEBONE_WIFI_PASSWORD: The password to login to the WiFi network advertised by this BeagleBone
 # DEBIAN_USER_PASSWORD: The password to update the debian user to. Change from 'temppwd' to this
 # ECHENEIDAE_WIFI_PASSWORD: The password of the Encheneidae SSID, which this BeagleBone will connect to if available
-for ENV_VAR in BEAGLEBONE_WIFI_PASSWORD DEBIAN_USER_PASSWORD ECHENEIDAE_WIFI_PASSWORD; do
+for ENV_VAR in BEAGLEBONE_WIFI_PASSWORD DEBIAN_USER_PASSWORD ECHENEIDAE_WIFI_PASSWORD DIGITAL_OCEAN_ACCESS_KEY DIGITAL_OCEAN_SECRET; do
         if [[ -z "${!ENV_VAR}" ]]; then
-                echo "Must set environment variable $ENV_VAR";
-		exit 1;
+            echo "Must set environment variable $ENV_VAR";
+            exit 1;
         fi
 done
 
 # Ensure CAN script has been copied, along with dbc database file
-if [[ ! -e generate_csv.py ]]; then
-	echo "Must copy generate_csv.py script over to host"
-	exit 1;
+if [[ ! -e canparse.py ]]; then
+    echo "Must copy canparse.py script over to host"
+    exit 1;
 fi
 if [[ ! -e remora.dbc ]]; then
-	echo "Must copy remora.dbc file over to host"
-	exit 1;
+    echo "Must copy remora.dbc file over to host"
+    exit 1;
+fi
+if [[ ! -e beaglebone_can_upload.sh ]]; then
+    echo "Must copy beaglebone_can_upload.dbc file over to host"
+    exit 1;
 fi
 
 
@@ -70,7 +74,8 @@ sudo ln -s /lib/systemd/system/canconfigure.service /etc/systemd/system/
 
 # Create CAN logging script
 echo "#!/bin/bash
-candump -tA -L any >> /var/log/candump.log" | sudo tee /usr/bin/beaglebone_can_listen.sh > /dev/null
+mkdir -p /var/log/candump
+candump -tA -L any | tee -a /var/log/candump/candump.log > /dev/null" | sudo tee /usr/bin/beaglebone_can_listen.sh > /dev/null
 
 sudo chmod +x /usr/bin/beaglebone_can_listen.sh
 
@@ -94,14 +99,80 @@ WantedBy=multi-user.target" | sudo tee /lib/systemd/system/canlog.service > /dev
 
 sudo ln -s /lib/systemd/system/canlog.service /etc/systemd/system/
 
+# Configure candump log rotation. Once the file is > LOG_FILE_SIZE_MB MB, it will be copied to another file, truncated, and the new file will be compressed
+LOG_FILE_SIZE_MB=100
+NUM_LOG_FILES_AVAILABLE=$((`df --block-size=M | grep '/dev/mmcb' | awk '{ print $4 }' | sed 's/M//g'` / $LOG_FILE_SIZE_MB - 2))
+
+echo "/var/log/candump/candump.log {
+    rotate $NUM_LOG_FILES_AVAILABLE
+    size ${LOG_FILE_SIZE_MB}M
+    compress
+    copytruncate
+}" | sudo tee /etc/logrotate.d/canlog > /dev/null
+
+# Update logrotate systemd timer to run every 10 minutes
+sudo sed -i 's/OnCalendar=.*/OnCalendar=*:0\/10/g' /lib/systemd/system/logrotate.timer
+
+sudo systemctl enable logrotate.timer
 sudo systemctl enable canconfigure
 sudo systemctl enable canlog
+
+# Install rclone
+sudo apt-get update
+sudo apt-get install p7zip-full
+curl https://rclone.org/install.sh | sudo bash
+
+# Configure rclone
+echo "[digitalocean]
+type = s3
+provider = DigitalOcean
+access_key_id = ${DIGITAL_OCEAN_ACCESS_KEY}
+secret_access_key = ${DIGITAL_OCEAN_SECRET}
+endpoint = nyc3.digitaloceanspaces.com" | sudo tee /root/.config/rclone/rclone.conf > /dev/null
+
+# Add rclone upload script
+sudo mv beaglebone_can_upload.sh /usr/bin
+sudo chmod +x /usr/bin/beaglebone_can_upload.sh
+
+# Setup systemd timer for upload script
+echo "[Unit]
+Description=Upload CAN data to the cloud
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/beaglebone_can_upload.sh
+
+[Install]
+WantedBy=multi-user.target" |  sudo tee /lib/systemd/system/canupload.service > /dev/null
+
+sudo ln -s /lib/systemd/system/canupload.service /etc/systemd/system/
+
+echo "[Unit]
+Description=Pushes CAN logs to the cloud
+Requires=canupload.service
+
+[Timer]
+Unit=canupload.service
+OnCalendar=*:0/2
+AccuracySec=15s
+
+[Install]
+WantedBy=timers.target" | sudo tee /lib/systemd/system/canupload.timer > /dev/null
+
+sudo ln -s /lib/systemd/system/canupload.timer /etc/systemd/system/
 
 # Install python dependencies globally
 python3 -m pip install wheel
 python3 -m pip install git+https://github.com/eerimoq/cantools.git@3bbc98bd2a9fc2d62979fca0bbf9a6c9b8e84df1#egg=cantools
-sudo mv generate_csv.py /usr/local/bin
+
+# Install canparse script
+sudo mv canparse.py /usr/local/bin
 sudo mv remora.dbc /usr/local/bin
+
+echo "#!/bin/bash
+python3 /usr/local/bin/canparse.py \"\$@\"" | sudo tee /usr/local/bin/canparse > /dev/null
+
+sudo chmod +x /usr/local/bin/canparse
 
 # Use handy BeagleBone script to partition disk to full size of SD card
 sudo /opt/scripts/tools/grow_partition.sh
