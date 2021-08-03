@@ -108,6 +108,9 @@ echo "/var/log/candump/candump.log {
     size ${LOG_FILE_SIZE_MB}M
     compress
     copytruncate
+    dateext
+    dateformat %Y%m%d.%s
+    extension .log
 }" | sudo tee /etc/logrotate.d/canlog > /dev/null
 
 # Update logrotate systemd timer to run every 10 minutes
@@ -121,6 +124,8 @@ sudo systemctl enable canlog
 sudo apt-get update
 sudo apt-get install p7zip-full
 curl https://rclone.org/install.sh | sudo bash
+
+sudo mkdir -p /root/.config/rclone/
 
 # Configure rclone
 echo "[digitalocean]
@@ -160,6 +165,8 @@ AccuracySec=15s
 WantedBy=timers.target" | sudo tee /lib/systemd/system/canupload.timer > /dev/null
 
 sudo ln -s /lib/systemd/system/canupload.timer /etc/systemd/system/
+
+sudo systemctl enable canupload.timer
 
 # Install python dependencies globally
 python3 -m pip install wheel
