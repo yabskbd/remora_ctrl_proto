@@ -177,7 +177,7 @@ sudo mv canparse.py /usr/local/bin
 sudo mv remora.dbc /usr/local/bin
 
 echo "#!/bin/bash
-python3 /usr/local/bin/canparse.py \"\$@\"" | sudo tee /usr/local/bin/canparse > /dev/null
+python3 -u /usr/local/bin/canparse.py \"\$@\"" | sudo tee /usr/local/bin/canparse > /dev/null
 
 sudo chmod +x /usr/local/bin/canparse
 
