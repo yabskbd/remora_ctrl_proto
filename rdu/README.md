@@ -39,7 +39,19 @@ sudo journalctl -u canupload.*
 To parse the current CAN logs into a CSV:
 
 ```
-tail -f /var/log/candump/candump.log | canparse >> ~/parseddump.csv &
+tail -f /var/log/candump/candump.log | canparse > ~/parseddump.csv &
+```
+
+This will print the pid of the process back to you. Something like this:
+
+```
+[1] 2678
+```
+
+Since we are spwaning subprocesses, the best way to kill the parsing is like this:
+
+```
+pkill -P 2678
 ```
 
 This will run the parsing in the background. If you then want to watch the parsed data flow in, you can run:
@@ -47,6 +59,7 @@ This will run the parsing in the background. If you then want to watch the parse
 ```
 tail -f ~/parseddump.csv
 ```
+
 
 Finally, if you want to copy the parsed dump back to your laptop, you can run this via Git Bash on your laptop:
 
