@@ -24,17 +24,23 @@ def get_all_signals(can_database, pgns_to_include):
         for signal in message.signals:
             signal_name_to_idx[signal.name] = idx
             idx += 1
-            header = signal.name
-            if signal.unit:
-                header += f' ({signal.unit})'
-            csv_headers.append(header)
+            csv_headers.append(signal.name)
 
     return signal_name_to_idx, csv_headers
 
-def decode_row(row, parser):
+def get_notset_signal_values(can_database, decode_choices):
+    signal_to_notset_value = {}
+    for message in can_database.messages:
+        decoded_signals = message.decode(bytearray.fromhex('ff' * message.length), decode_choices=decode_choices)
+        for signal_name, notset_value in decoded_signals.items():
+            signal_to_notset_value[signal_name] = notset_value
+
+    return signal_to_notset_value
+
+def decode_row(row, parser, decode_choices):
     parsed_row = parser.parse(row)
     message = db.get_message_by_frame_id(parsed_row.frame_id)
-    return DecodedMessage(timestamp=parsed_row.timestamp, signal_values=message.decode(parsed_row.data))
+    return DecodedMessage(timestamp=parsed_row.timestamp, signal_values=message.decode(parsed_row.data, decode_choices=decode_choices))
 
 def update_latest_values(decoded_row, latest_values_by_signal_name):
     for signal_name, signal_value in decoded_row.signal_values.items():
@@ -75,6 +81,9 @@ if __name__ == '__main__':
                         dest='pgns', type=str, default=None)
     parser.add_argument('--input-file', help='A CAN dump file to use as input',
                         dest='inputfile', type=str, default=None)
+    parser.add_argument('--decode-choices', dest='decode_choices', action='store_true')
+    parser.set_defaults(decode_choices=False)
+
     args = parser.parse_args()
     time_bucket = timedelta(milliseconds=args.time_bucket)
     pgns_to_include = set([int(p) for p in args.pgns.split(',')]) if args.pgns else None
@@ -91,6 +100,8 @@ if __name__ == '__main__':
     signal_name_to_idx, csv_headers = get_all_signals(db, pgns_to_include)
     print(','.join(csv_headers))
 
+    signal_name_to_notset_value = get_notset_signal_values(db, args.decode_choices)
+
     first_row = True  # Used for initial time bucketing logic
 
     # While you can simply cat a file and pipe it to this script, pdb sometimes works better if you specify the inputfile in advance
@@ -103,7 +114,7 @@ if __name__ == '__main__':
         row = row.strip()
         try:
             try:
-                decoded_row = decode_row(row, can_parser)
+                decoded_row = decode_row(row, can_parser, args.decode_choices)
             except KeyError:
                 continue
 
@@ -117,6 +128,9 @@ if __name__ == '__main__':
                 print_data_row(bucket_time, signal_name_to_idx, latest_values_by_signal_name)
 
             for signal_name, signal_value in decoded_row.signal_values.items():
+                if signal_name_to_notset_value[signal_name] == signal_value:
+                    continue
+
                 latest_values_by_signal_name[signal_name] = signal_value
         except Exception as ex:
             print(ex)
