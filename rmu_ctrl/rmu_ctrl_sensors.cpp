@@ -1,3 +1,9 @@
+/* Arduino Libraries */
+#if defined(__AVR_ATmega2560__)
+#include "SHT1x.h"
+#endif
+
+
 /* RMU Libraries */
 #include "rmu_utils.h"
 #include "rmu_ctrl_sensors.h"

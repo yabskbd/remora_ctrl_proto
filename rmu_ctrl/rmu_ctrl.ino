@@ -1,11 +1,13 @@
-
 /* Arduino Libraries */
+#if defined(__AVR_ATmega2560__)
 #include <Arduino.h>
 #include <SPI.h>
 #include <SD.h>
-
 /* External Libraries */
 #include "mcp2515_can.h"
+#endif /* Arduino Libraries */
+
+
 
 /* RMU Libraries */
 #include "rmu_utils.h"
