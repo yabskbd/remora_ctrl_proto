@@ -86,6 +86,7 @@ void __assert(const char *__func, const char *__file, int __lineno, const char *
 /*! Input adc_raw_value and the Min & Max of the Range of the particular unit of interest. 
     Returns the value within range for the respective adc_val 
     Required: min_range < max_range */
-double adc_range_based_interpreter(int adc_val, double min_range, double max_range);
+double rmu_utils_adc_range_based_interpreter(int adc_val, double min_range, double max_range, double offset = 0);
+  
 
 #endif
