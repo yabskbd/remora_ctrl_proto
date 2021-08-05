@@ -17,31 +17,12 @@
 #include "rmu_ctrl_sensors.h"
 
 
-//filename for the SD card
-String file;
-
 //time in ms between each round of sensor readings
 //will run into issues if kept on for more than 40 days
 #define RMU_CTRL_SWEEP_INTERNVAL_IN_MS_0 6000
 
 #define RMU_CTRL_SWEEP_INTERNVAL_IN_MS_1 (RMU_CTRL_SWEEP_INTERNVAL_IN_MS_0/2)
 
-
-static uint32_t curr_sweep_internval = 0;
-
-
-//time since start in ms
-long localTime = 0;
-
-//stores time of most recent sensor sweep in ms; won't be accurate for the first sweep
-long last_sensor_sweep_ms = 0;
-
-//stage in sorption cycle
-//0 = adsorption
-//1 = preheating
-//2 = desorption
-//3 = precooling
-byte stage = 0;
 
 static bool is_first_run = TRUE;
 
@@ -66,8 +47,6 @@ void setup() {
   Sprintln("Serials initialized");
   
   rmu_ctrl_sesnors_init();
-
-  last_sensor_sweep_ms = millis();
 
   while (CAN_OK != CAN.begin(CAN_BAUD_RATE)) 
   {    
