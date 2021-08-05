@@ -63,7 +63,7 @@ sudo chmod +x /usr/bin/beaglebone_can_setup.sh
 
 # Create systemd unit file to run CAN setup script on startup
 echo "[Unit]
-Description=Configure CAN buses on system startup
+Description=Remora CAN Configuration
 
 [Service]
 Type=simple
@@ -84,7 +84,7 @@ sudo chmod +x /usr/bin/beaglebone_can_listen.sh
 
 # Create systemd unit file to run CAN logging script on startup, and restart on failure
 echo "[Unit]
-Description=Listens to all CAN buses and logs to a file
+Description=Remora CAN Logger
 Requires=remoracanconfigure.service
 After=remoracanconfigure.service syslog.target
 
@@ -159,7 +159,7 @@ WantedBy=multi-user.target" |  sudo tee /lib/systemd/system/remoracanupload.serv
 sudo ln -sf /lib/systemd/system/remoracanupload.service /etc/systemd/system/
 
 echo "[Unit]
-Description=Pushes CAN logs to the cloud
+Description=Remora CAN Log Cloud Uploader
 Requires=remoracanupload.service
 After=syslog.target
 

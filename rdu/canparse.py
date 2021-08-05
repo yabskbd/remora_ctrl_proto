@@ -137,7 +137,6 @@ def generate_csv(args):
 
 def get_choices_table(signal):
     sql = f'CREATE TABLE IF NOT EXISTS {signal.name}_choices (choice_id smallint PRIMARY KEY  NOT NULL, choice_value varchar(50) NOT NULL);\n'
-    sql += f'SELECT create_hypertable(\'can_data_test\', \'signal_time_utc\', if_not_exists => TRUE);\n'
     sql += f'CREATE TEMPORARY TABLE {signal.name}_choices_temp (choice_id smallint PRIMARY KEY NOT NULL, choice_value varchar(50) NOT NULL) ON COMMIT DROP;\n'
     choice_values = ',\n'.join([f'\t({choice_id}, \'{choice_value}\')' for choice_id, choice_value in signal.choices.items()])
     sql += f'INSERT INTO {signal.name}_choices_temp (choice_id, choice_value) VALUES\n {choice_values};\n'
@@ -148,10 +147,12 @@ def get_choices_table(signal):
 def generate_sql():
     can_db = get_can_db()
     message: Message
-    TABLE_NAME = 'can_data_test'
-    sql = f'CREATE TABLE IF NOT EXISTS customer (customer_id SMALLSERIAL PRIMARY KEY NOT NULL, customer_name VARCHAR(200) NOT NULL);\n'
+    TABLE_NAME = 'can_data'
+    sql = 'CREATE EXTENSION IF NOT EXISTS timescaledb CASCADE;\n'
+    sql += f'CREATE TABLE IF NOT EXISTS customer (customer_id SMALLSERIAL PRIMARY KEY NOT NULL, customer_name VARCHAR(200) NOT NULL);\n'
     sql += f'CREATE TABLE IF NOT EXISTS device (device_id UUID PRIMARY KEY NOT NULL, customer_id SMALLINT NULL REFERENCES customer (customer_id));\n'
     sql += f'CREATE TABLE IF NOT EXISTS {TABLE_NAME} (signal_time_utc TIMESTAMP WITHOUT TIME ZONE NOT NULL, device_id UUID NOT NULL REFERENCES device (device_id));\n'
+    sql += f'SELECT create_hypertable(\'{TABLE_NAME}\', \'signal_time_utc\', if_not_exists => TRUE);\n'
     for message in can_db.messages:
         signal: Signal
         for signal in message.signals:
