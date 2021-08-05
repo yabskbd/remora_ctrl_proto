@@ -4,7 +4,7 @@
 /*! ADC Max Resolution in bits
     For Arduino ref: https://www.arduino.cc/reference/en/language/functions/analog-io/analogread/ 
     Mega Resolution is 10bits i.e 0 - 1023 */
-#define RMU_CTRL_DEFS_MAX_VOLTAGE      4.5
+#define RMU_CTRL_DEFS_MAX_VOLTAGE      5
 #define ADC_MAX_RESOLUTION_IN_BITS     10
 #define ADC_MAX_RESOULTION             ((1 << ADC_MAX_RESOLUTION_IN_BITS) - 1)
 
