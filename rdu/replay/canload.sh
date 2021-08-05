@@ -41,7 +41,7 @@ while true; do
     attempt_count=0
     max_attempts=5
     while (test "$attempt_count" -le 5); do
-        cat /tmp/$unzipped_file_to_parse | python3 canparse.py --device-id $device_id | PGPASSWORD='azy7bm1fxar0i2j3' psql --host=private-canpostgres-do-user-9606770-0.b.db.ondigitalocean.com --port=25060 --dbname=defaultdb --username=doadmin  -c "INSERT INTO device (device_id) VALUES ('$device_id') ON CONFLICT DO NOTHING; COPY can_data_test FROM STDIN DELIMITER ',' CSV HEADER;"
+        cat /tmp/$unzipped_file_to_parse | python3 canparse.py --device-id $device_id | psql --host=private-canpostgres-do-user-9606770-0.b.db.ondigitalocean.com --port=25060 --dbname=defaultdb --username=doadmin  -c "INSERT INTO device (device_id) VALUES ('$device_id') ON CONFLICT DO NOTHING; COPY can_data_test FROM STDIN DELIMITER ',' CSV HEADER;"
         if [[ $? -ne 0 ]]; then
             echoerr "Error parsing $file_to_parse"
         else
