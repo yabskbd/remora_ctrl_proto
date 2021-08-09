@@ -14,18 +14,21 @@ done
 
 # Ensure CAN script has been copied, along with dbc database file
 for file_name in canparse.py remora.dbc beaglebone_can_upload.sh BB-I2C1-RTC-DS3231.dts; do
-        [[ ! -e $file_name ]];
+        if [[ ! -e $file_name ]]; then
             echo "Must copy $file_name file over to host";
             exit 1;
         fi
 done
 
 # Generate a random name for the host, and update relevant files
+echo "Updating host name..."
 echo "remorabone$(</proc/sys/kernel/random/uuid)" | sudo tee /etc/hostname > /dev/null
 host_name=$(cat /etc/hostname) 
 sudo sed -i "s/beaglebone/$host_name/g" /etc/hosts
+sudo sed -i "s/remorabone.\{36\}/$host_name/g" /etc/hosts
 
 # Update the SoftAP settings, so the BeagleBone advertises a unique SSID, accessible with the generated 
+echo "Updating SoftAP settings..."
 first_part_of_host_name=$(echo $host_name | sed -e 's/remorabone\(.*\)-\(.*\)-\(.*\)-\(.*\)-\(.*\)$/\1/')
 beaglebone_wifi_password=$(< /dev/urandom tr -dc A-Z-a-z-0-9 | head -c${1:-32})
 sudo sed -i 's/USE_PERSONAL_PASSWORD=".*"/USE_PERSONAL_PASSWORD="'$beaglebone_wifi_password'"/g' /etc/default/bb-wl18xx
@@ -33,6 +36,7 @@ sudo sed -i 's/USE_PERSONAL_SSID=".*"/USE_PERSONAL_SSID="RemoraBone'$first_part_
 sudo sed -i 's/USE_APPENDED_SSID=yes/USE_APPENDED_SSID=no/g' /etc/default/bb-wl18xx
 
 # Add connmanctl settings, so we connect to WiFi automatically
+echo "Updating connmanctl..."
 echo "[global]
 Name = Echeneidae
 Description = Remora network services
@@ -43,6 +47,7 @@ Name = Echeneidae
 Passphrase = $ECHENEIDAE_WIFI_PASSWORD" | sudo tee /var/lib/connman/echeneidae.config > /dev/null
 
 # Create CAN setup script
+echo "Adding CAN setup service..."
 echo "#!/bin/bash
 sudo config-pin p9.24 can
 sudo config-pin p9.26 can
@@ -70,6 +75,7 @@ WantedBy=multi-user.target" | sudo tee /lib/systemd/system/remoracanconfigure.se
 sudo ln -sf /lib/systemd/system/remoracanconfigure.service /etc/systemd/system/
 
 # Create CAN logging script
+echo "Adding CAN logging service..."
 echo "#!/bin/bash
 mkdir -p /var/log/candump
 candump -tA -L any | tee -a /var/log/candump/candump.log > /dev/null" | sudo tee /usr/bin/beaglebone_can_listen.sh > /dev/null
@@ -97,6 +103,7 @@ WantedBy=multi-user.target" | sudo tee /lib/systemd/system/remoracanlog.service 
 sudo ln -sf /lib/systemd/system/remoracanlog.service /etc/systemd/system/
 
 # Configure candump log rotation. Once the file is > log_file_size_mb MB, it will be copied to another file, truncated, and the new file will be compressed
+echo "Configuring CAN log rotation..."
 log_file_size_mb=10
 num_log_files_available=$((`df --block-size=M | grep '/dev/mmcb' | awk '{ print $4 }' | sed 's/M//g'` / $log_file_size_mb))
 
@@ -118,6 +125,7 @@ sudo systemctl enable remoracanconfigure.service
 sudo systemctl enable remoracanlog.service
 
 # Install rclone
+echo "Installing rclone..."
 if ! [[ -x $(command -v rclone) ]]; then
     sudo apt-get update
     sudo apt-get -y install p7zip-full
@@ -135,6 +143,7 @@ secret_access_key = ${DIGITAL_OCEAN_SECRET}
 endpoint = nyc3.digitaloceanspaces.com" | sudo tee /root/.config/rclone/rclone.conf > /dev/null
 
 # Add rclone upload script
+echo "Adding CAN upload service..."
 sudo mv beaglebone_can_upload.sh /usr/bin
 sudo chmod +x /usr/bin/beaglebone_can_upload.sh
 
@@ -170,6 +179,7 @@ sudo ln -sf /lib/systemd/system/remoracanupload.timer /etc/systemd/system/
 sudo systemctl enable remoracanupload.timer
 
 # Install python dependencies globally
+echo "Installing Python requirements..."
 python3 -m pip install wheel
 python3 -m pip install git+https://github.com/eerimoq/cantools.git@3bbc98bd2a9fc2d62979fca0bbf9a6c9b8e84df1#egg=cantools
 
@@ -185,17 +195,19 @@ sudo chmod +x /usr/local/bin/canparse
 # Use handy BeagleBone script to partition disk to full size of SD card
 sudo /opt/scripts/tools/grow_partition.sh
 
-debian_password=$(< /dev/urandom tr -dc A-Z-a-z-0-9 | head -c${1:-32})
-
 # Disable bluetooth
+echo "Disabling bluetooth..."
 sudo systemctl stop bb-wl18xx-bluetooth
 sudo systemctl disable bb-wl18xx-bluetooth
 sudo systemctl stop bluetooth
 sudo systemctl disable bluetooth
 
 # Install DS3231 RTC on I2C1 interface
+echo "Setting up RTC..."
+set +e
 cat /boot/uEnv.txt | grep DS3231 > /dev/null
 rtc_already_exists=$?
+set -e
 if [[ rtc_already_exists -ne 0 ]]; then
     git clone https://github.com/beagleboard/bb.org-overlays.git
     cd bb.org-overlays
@@ -207,6 +219,8 @@ if [[ rtc_already_exists -ne 0 ]]; then
 fi
 
 # Update password from default 'temppwd' to provided DEBIAN_USER_PASSWORD
+echo "Updating debian password..."
+debian_password=$(< /dev/urandom tr -dc A-Z-a-z-0-9 | head -c${1:-32})
 echo "debian:$debian_password" | sudo chpasswd
 echo "Successfully setup $host_name"
 echo "************************************************"
