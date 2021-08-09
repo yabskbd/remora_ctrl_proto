@@ -13,18 +13,12 @@ for ENV_VAR in ECHENEIDAE_WIFI_PASSWORD DIGITAL_OCEAN_ACCESS_KEY DIGITAL_OCEAN_S
 done
 
 # Ensure CAN script has been copied, along with dbc database file
-if [[ ! -e canparse.py ]]; then
-    echo "Must copy canparse.py script over to host"
-    exit 1;
-fi
-if [[ ! -e remora.dbc ]]; then
-    echo "Must copy remora.dbc file over to host"
-    exit 1;
-fi
-if [[ ! -e beaglebone_can_upload.sh ]]; then
-    echo "Must copy beaglebone_can_upload.sh file over to host"
-    exit 1;
-fi
+for file_name in canparse.py remora.dbc beaglebone_can_upload.sh BB-I2C1-RTC-DS3231.dts; do
+        [[ ! -e $file_name ]];
+            echo "Must copy $file_name file over to host";
+            exit 1;
+        fi
+done
 
 # Generate a random name for the host, and update relevant files
 echo "remorabone$(</proc/sys/kernel/random/uuid)" | sudo tee /etc/hostname > /dev/null
@@ -192,6 +186,25 @@ sudo chmod +x /usr/local/bin/canparse
 sudo /opt/scripts/tools/grow_partition.sh
 
 debian_password=$(< /dev/urandom tr -dc A-Z-a-z-0-9 | head -c${1:-32})
+
+# Disable bluetooth
+sudo systemctl stop bb-wl18xx-bluetooth
+sudo systemctl disable bb-wl18xx-bluetooth
+sudo systemctl stop bluetooth
+sudo systemctl disable bluetooth
+
+# Install DS3231 RTC on I2C1 interface
+cat /boot/uEnv.txt | grep DS3231 > /dev/null
+rtc_already_exists=$?
+if [[ rtc_already_exists -ne 0 ]]; then
+    git clone https://github.com/beagleboard/bb.org-overlays.git
+    cd bb.org-overlays
+    cp ../BB-I2C1-RTC-DS3231.dts src/arm
+    ./install.sh
+    cd ..
+    rm -rf bb.org-overlays
+    echo -e "\ndtb_overlay=/lib/firmware/BB-I2C1-RTC-DS3231.dtbo\n" | sudo tee -a  /boot/uEnv.txt > /dev/null
+fi
 
 # Update password from default 'temppwd' to provided DEBIAN_USER_PASSWORD
 echo "debian:$debian_password" | sudo chpasswd
