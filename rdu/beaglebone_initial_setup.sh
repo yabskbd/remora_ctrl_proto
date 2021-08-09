@@ -202,6 +202,7 @@ if [[ rtc_already_exists -ne 0 ]]; then
     cp ../BB-I2C1-RTC-DS3231.dts src/arm
     ./install.sh
     cd ..
+    rm -rf bb.org-overlays
     echo -e "\ndtb_overlay=/lib/firmware/BB-I2C1-RTC-DS3231.dtbo\n" | sudo tee -a  /boot/uEnv.txt > /dev/null
 fi
 
