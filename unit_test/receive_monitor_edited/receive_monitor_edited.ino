@@ -23,12 +23,8 @@ const int CAN_INT_PIN = BCM25;
 // For Arduino MCP2515 Hat:
 // the cs pin of the version after v1.1 is default to D9
 // v0.9b and v1.0 is default D10
-const int SPI_CS_PIN = 10;
-const int SPI_CS_PIN2 = 9;
+const int SPI_CS_PIN = 53;
 const int CAN_INT_PIN = 2;
-const int interruption = 3;
-const int interruption2 = 2;
-bool toggle = 0;
 #endif
 
 
@@ -54,27 +50,6 @@ void setup() {
     SERIAL_PORT_MONITOR.begin(115200);
     while (!SERIAL_PORT_MONITOR) {}
 
-    cli();
-
-    TCCR1A = 0;// set entire TCCR1A register to 0
-    TCCR1B = 0;// same for TCCR1B
-    TCNT1  = 0;//initialize counter value to 0
-    // set compare match register for 1hz increments
-    OCR1A = 15624;// = (16*10^6) / (1*1024) - 1 (must be <65536)
-    // turn on CTC mode
-    TCCR1B |= (1 << WGM12);
-    // Set CS10 and CS12 bits for 1024 prescaler
-    TCCR1B |= (1 << CS12) | (1 << CS10);  
-    // enable timer compare interrupt
-    TIMSK1 |= (1 << OCIE1A);
-
-    sei();
-
-    pinMode(interruption, INPUT_PULLUP);
-    attachInterrupt(digitalPinToInterrupt(interruption), scream, RISING);
-    pinMode(interruption2, INPUT_PULLUP);
-    attachInterrupt(digitalPinToInterrupt(interruption2), scream2, FALLING);
-
     #if MAX_DATA_SIZE > 8
     /*
      * To compatible with MCP2515 API,
@@ -88,6 +63,7 @@ void setup() {
         SERIAL_PORT_MONITOR.println(F("CAN init fail, retry..."));
         delay(100);
     }
+    SERIAL_PORT_MONITOR.println(F("CAN init ok!"));
 }
 
 uint32_t id;
@@ -96,11 +72,6 @@ uint8_t  len;
 byte cdata[MAX_DATA_SIZE] = {0};
 
 void loop() {
-
-  ///////////////////////////////////////////////////
-  //CAN
-
-  
     // check if data coming
     if (CAN_MSGAVAIL != CAN.checkReceive()) {
         return;
@@ -138,23 +109,4 @@ void loop() {
     }
     SERIAL_PORT_MONITOR.println(prbuf);
 }
-
-void scream() {
-  Serial.println("INTERRUPTED");
-}
-void scream2() {
-  Serial.println("INTERRUPTED2");
-}
-
-ISR(TIMER1_COMPA_vect){//timer1 interrupt 1Hz toggles pin 13 (LED)
-//generates pulse wave of frequency 1Hz/2 = 0.5kHz (takes two cycles for full wave- toggle high then toggle low)
-  if (toggle){
-    Serial.println("Time");
-  }
-  else{
-    Serial.println("Not Time");
-  }
-  toggle = !toggle;
-}
-
 // END FILE

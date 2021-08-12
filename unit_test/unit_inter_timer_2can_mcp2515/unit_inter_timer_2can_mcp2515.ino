@@ -86,11 +86,11 @@ void setup() {
     CAN2.setMode(CAN_NORMAL_MODE);
     #endif
 
-    while (CAN_OK != CAN.begin(CAN_500KBPS)) {             // init can bus : baudrate = 500k
+    while (CAN_OK != CAN.begin(CAN_250KBPS)) {             // init can bus : baudrate = 500k
         SERIAL_PORT_MONITOR.println(F("CAN init fail, retry..."));
         delay(100);
     }
-    while (CAN_OK != CAN2.begin(CAN_500KBPS)) {             // init can bus : baudrate = 500k
+    while (CAN_OK != CAN2.begin(CAN_250KBPS)) {             // init can bus : baudrate = 500k
         SERIAL_PORT_MONITOR.println(F("CAN2 init fail, retry..."));
         delay(100);
     }
