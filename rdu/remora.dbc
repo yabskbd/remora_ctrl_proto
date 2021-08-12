@@ -36,12 +36,83 @@ BS_:
 BU_: Turbocharger OnBoardDataLogger OffBoardDiagnosticTool2 OffBoardDiagnosticTool1 FileServer ParkingBrakeController SeatControl2 FanDriveController SteeringColumnUnit CommunicationUnitRadio CommunicationUnitSatellite CommunicationUnitCellular PropulsionBatteryCharger ChassisController2 ChassisController1 EngineValveControl AuxiliaryHeater2 AuxiliaryHeater1 ClutchUnit RampControl InformationSystem1 SuspensionSystemController2 OilSensor VehicleDynamicStability ExhaustEmissionController TransmissionDisplay2 TransmissionDisplay1 ClimateControl2 WaterPumpController RearAxleSteeringController LightingOperatorControl SeatController1 IgnitionController2 IgnitionController1 TirePressureController CabController2 CabController1 PneumaticSystemController SuspensionSystemController1 HydraulicPumpController EnduranceBrakingSystem RetarderExhaustEngine2 OnBoardDiagnosticUnit HeadwayController RetarderExhaustEngine1 CabDisplay1 ManagementComputer VirtualTerminal OffVehicleGateway PowerTakeOffFront HitchControl AuxiliaryValveControl BodyController TractorTrailerBridge1 StarterSystem ElectricalSystem VehicleSecurity VehicleNavigation AerodynamicControl ElectricalChargingSystem ClimateControl1 TripRecorder InstrumentCluster SuspensionDriveAxle2 SuspensionDriveAxle1 SuspensionSteerAxle SteeringController FuelSystem CruiseControl RetarderDriveline RetarderEngine BrakesDriveAxle2 BrakesDriveAxle1 BrakesSystemController BrakesSteerAxle AxleDrive2 AxleDrive1 AxleSteering PowerTakeOff ShiftConsoleSecondary ShiftConsolePrimary Transmission2 Transmission1 Engine2 Engine1
 
 
+BO_ 2566749438 DPFC1: 8 Vector__XXX
+ SG_ DslPrtcltFltrPssvRgnrtionStatus : 8|2@1+ (1,0) [0|3] "" Vector__XXX
+ SG_ DslPrtcltFltrActvRgnrtionStatus : 10|2@1+ (1,0) [0|3] "" Vector__XXX
+
+BO_ 2566846206 IC1: 8 Vector__XXX
+ SG_ EngExhaustGasTemp : 40|16@1+ (0.03125,-273) [-273|1734.97] "deg C" Vector__XXX
+
+BO_ 2566845182 LFE: 8 Vector__XXX
+ SG_ EngFuelRate : 0|16@1+ (0.05,0) [0|3212.75] "L/h" Vector__XXX
+
+BO_ 2633929470 EI: 8 Vector__XXX
+ SG_ InstantaneousEstBrakePower : 48|16@1+ (0.5,0) [0|32127.5] "kW" Vector__XXX
+
+BO_ 2364541694 EGF1: 8 Vector__XXX
+ SG_ EngIntakeAirMassFlowRate : 16|16@1+ (0.05,0) [0|3212.75] "kg/h" Vector__XXX
+
+BO_ 2566840318 EEC3: 8 Vector__XXX
+ SG_ Aftrtratment1ExhaustGasMassFlow : 40|16@1+ (0.2,0) [0|12851] "kg/h" Vector__XXX
+
+BO_ 2364539902 EEC2: 8 Vector__XXX
+ SG_ EngPercentLoadAtCurrentSpeed : 16|8@1+ (1,0) [0|250] "%" Vector__XXX
+
+BO_ 2364540158 EEC1: 8 Vector__XXX
+ SG_ EngSpeed : 24|16@1+ (0.125,0) [0|8031.88] "rpm" Vector__XXX
+ SG_ ActualEngPercentTorque : 16|8@1+ (1,-125) [-125|125] "%" Vector__XXX
+
+BO_ 2566841342 EC1: 39 Vector__XXX
+ SG_ EngReferenceTorque : 152|16@1+ (1,0) [0|64255] "Nm" Vector__XXX
+
+BO_ 2566844926 CCVS: 8 Vector__XXX
+ SG_ WheelBasedVehicleSpeed : 8|16@1+ (0.00390625,0) [0|250.996] "km/h" Vector__XXX
+
+BO_ 2566763774 AT1IG2: 8 Vector__XXX
+ SG_ Aftertreatment1ExhaustGasTemp1 : 0|16@1+ (0.03125,-273) [-273|1734.97] "deg C" Vector__XXX
+
+BO_ 2566763262 AT1IMG: 8 Vector__XXX
+ SG_ Aftertreatment1ExhaustGasTemp2 : 0|16@1+ (0.03125,-273) [-273|1734.97] "deg C" Vector__XXX
+
+BO_ 2566763518 AT1OG2: 8 Vector__XXX
+ SG_ Aftertreatment1ExhaustGasTemp3 : 0|16@1+ (0.03125,-273) [-273|1734.97] "deg C" Vector__XXX
+
 BO_ 256 TMPBB1: 8 Vector__XXX
- SG_ Themocouple1Temperature : 23|16@0+ (0.01,0) [0|0] "C" Vector__XXX
- SG_ Themocouple2Temperature : 55|16@0+ (0.01,0) [0|0] "C" Vector__XXX
+ SG_ ThermoCouple1Temperature : 23|16@0+ (0.01,0) [0|0] "C" Vector__XXX
+ SG_ ThermoCouple2Temperature : 55|16@0+ (1,0) [0|0] "" Vector__XXX
 
 
 
+CM_ BO_ 2566749438 "Diesel Particulate Filter Control 1";
+CM_ SG_ 2566749438 DslPrtcltFltrPssvRgnrtionStatus "Indicates the state of diesel particulate filter passive regeneration.";
+CM_ SG_ 2566749438 DslPrtcltFltrActvRgnrtionStatus "Indicates the state of diesel particulate filter active regeneration.";
+CM_ BO_ 2566846206 "Intake/Exhaust Conditions 1";
+CM_ SG_ 2566846206 EngExhaustGasTemp "Temperature of combustion byproducts leaving the engine.
+";
+CM_ BO_ 2566845182 "Fuel Economy (Liquid)";
+CM_ SG_ 2566845182 EngFuelRate "Amount of fuel consumed by engine per unit of time.";
+CM_ BO_ 2633929470 "Engine Information";
+CM_ SG_ 2633929470 InstantaneousEstBrakePower "Estimate of the power developed by the engine.";
+CM_ BO_ 2364541694 "Engine Gas Flow Rate";
+CM_ SG_ 2364541694 EngIntakeAirMassFlowRate "Mass flow rate of fresh air entering the engine air intake, before any EGR mixer, if used.";
+CM_ BO_ 2566840318 "Electronic Engine Controller 3";
+CM_ SG_ 2566840318 Aftrtratment1ExhaustGasMassFlow "Measured/calculated exhaust gas mass upstream of the aftertreatment system in exhaust bank 1 and 2.";
+CM_ BO_ 2364539902 "Electronic Engine Controller 2";
+CM_ SG_ 2364539902 EngPercentLoadAtCurrentSpeed "The ratio of actual engine percent torque (indicated) to maximum indicated torque available at the current engine speed,";
+CM_ BO_ 2364540158 "Electronic Engine Controller 1";
+CM_ SG_ 2364540158 EngSpeed "Actual engine speed which is calculated over a minimum crankshaft angle of 720 degrees divided by the number of cylinders.";
+CM_ SG_ 2364540158 ActualEngPercentTorque "The calculated output torque of the engine.";
+CM_ BO_ 2566841342 "Engine Configuration 1";
+CM_ SG_ 2566841342 EngReferenceTorque "This parameter is the 100% reference value for all defined indicated engine torque parameters.";
+CM_ BO_ 2566844926 "Cruise Control/Vehicle Speed";
+CM_ SG_ 2566844926 WheelBasedVehicleSpeed "Speed of the vehicle as calculated from wheel or tailshaft speed.";
+CM_ BO_ 2566763774 "Aftertreatment 1 Intake Gas 2";
+CM_ SG_ 2566763774 Aftertreatment1ExhaustGasTemp1 "The reading from the exhaust gas temperature sensor located farthest upstream in the aftertreatment system in exhaust bank 1.
+";
+CM_ BO_ 2566763262 "Aftertreatment 1 Intermediate Gas";
+CM_ SG_ 2566763262 Aftertreatment1ExhaustGasTemp2 "The reading from the exhaust gas temperature sensor located midstream of the other two temperature sensors in the";
+CM_ BO_ 2566763518 "Aftertreatment 1 Outlet Gas 2";
+CM_ SG_ 2566763518 Aftertreatment1ExhaustGasTemp3 "The reading from the exhaust gas temperature sensor located farthest downstream in the aftertreatment system in";
 BA_DEF_ SG_  "SigType" ENUM  "Default","Range","RangeSigned","ASCII","Discrete","Control","ReferencePGN","DTC","StringDelimiter","StringLength","StringLengthControl";
 BA_DEF_ SG_  "GenSigStartValue" INT 0 10000;
 BA_DEF_ SG_  "GenSigSendType" ENUM  "Cyclic","OnWrite","reserved","OnChange","reserved","reserved","reserved","NoSigSendType";
@@ -115,6 +186,57 @@ BA_ "SAE_J1939_75_SpecVersion" "2005-10";
 BA_ "ProtocolType" "J1939";
 BA_ "BusType" "CAN";
 BA_ "DatabaseVersion" "7.2";
+BA_ "VFrameFormat" BO_ 2566749438 3;
+BA_ "SPN" SG_ 2566749438 DslPrtcltFltrPssvRgnrtionStatus 3699;
+BA_ "SPN" SG_ 2566749438 DslPrtcltFltrActvRgnrtionStatus 3700;
+BA_ "GenMsgCycleTime" BO_ 2566846206 500;
+BA_ "GenMsgSendType" BO_ 2566846206 0;
+BA_ "VFrameFormat" BO_ 2566846206 3;
+BA_ "SPN" SG_ 2566846206 EngExhaustGasTemp 173;
+BA_ "GenMsgCycleTime" BO_ 2566845182 100;
+BA_ "GenMsgSendType" BO_ 2566845182 0;
+BA_ "VFrameFormat" BO_ 2566845182 3;
+BA_ "SPN" SG_ 2566845182 EngFuelRate 183;
+BA_ "GenMsgCycleTime" BO_ 2633929470 100;
+BA_ "GenMsgSendType" BO_ 2633929470 0;
+BA_ "VFrameFormat" BO_ 2633929470 3;
+BA_ "SPN" SG_ 2633929470 InstantaneousEstBrakePower 1242;
+BA_ "GenMsgCycleTime" BO_ 2364541694 50;
+BA_ "GenMsgSendType" BO_ 2364541694 0;
+BA_ "VFrameFormat" BO_ 2364541694 3;
+BA_ "SPN" SG_ 2364541694 EngIntakeAirMassFlowRate 132;
+BA_ "GenMsgCycleTime" BO_ 2566840318 250;
+BA_ "GenMsgSendType" BO_ 2566840318 0;
+BA_ "VFrameFormat" BO_ 2566840318 3;
+BA_ "SPN" SG_ 2566840318 Aftrtratment1ExhaustGasMassFlow 3236;
+BA_ "GenMsgCycleTime" BO_ 2364539902 50;
+BA_ "GenMsgSendType" BO_ 2364539902 0;
+BA_ "VFrameFormat" BO_ 2364539902 3;
+BA_ "SPN" SG_ 2364539902 EngPercentLoadAtCurrentSpeed 92;
+BA_ "GenMsgCycleTime" BO_ 2364540158 100;
+BA_ "GenMsgSendType" BO_ 2364540158 0;
+BA_ "VFrameFormat" BO_ 2364540158 3;
+BA_ "SPN" SG_ 2364540158 EngSpeed 190;
+BA_ "SPN" SG_ 2364540158 ActualEngPercentTorque 513;
+BA_ "GenMsgSendType" BO_ 2566841342 8;
+BA_ "VFrameFormat" BO_ 2566841342 3;
+BA_ "SPN" SG_ 2566841342 EngReferenceTorque 544;
+BA_ "GenMsgCycleTime" BO_ 2566844926 100;
+BA_ "GenMsgSendType" BO_ 2566844926 0;
+BA_ "VFrameFormat" BO_ 2566844926 3;
+BA_ "SPN" SG_ 2566844926 WheelBasedVehicleSpeed 84;
+BA_ "GenMsgCycleTime" BO_ 2566763774 500;
+BA_ "GenMsgSendType" BO_ 2566763774 0;
+BA_ "VFrameFormat" BO_ 2566763774 3;
+BA_ "SPN" SG_ 2566763774 Aftertreatment1ExhaustGasTemp1 3241;
+BA_ "GenMsgCycleTime" BO_ 2566763262 500;
+BA_ "GenMsgSendType" BO_ 2566763262 0;
+BA_ "VFrameFormat" BO_ 2566763262 3;
+BA_ "SPN" SG_ 2566763262 Aftertreatment1ExhaustGasTemp2 3249;
+BA_ "GenMsgCycleTime" BO_ 2566763518 500;
+BA_ "GenMsgSendType" BO_ 2566763518 0;
+BA_ "VFrameFormat" BO_ 2566763518 3;
+BA_ "SPN" SG_ 2566763518 Aftertreatment1ExhaustGasTemp3 3245;
 BA_ "VFrameFormat" BO_ 256 0;
 BA_ "NmJ1939Function" BU_ Turbocharger 133;
 BA_ "NmStationAddress" BU_ Turbocharger 2;
@@ -336,4 +458,6 @@ BA_ "NmJ1939Function" BU_ Engine1 0;
 BA_ "NmJ1939System" BU_ Engine1 0;
 BA_ "NmJ1939IndustryGroup" BU_ Engine1 0;
 BA_ "NmStationAddress" BU_ Engine1 0;
+VAL_ 2566749438 DslPrtcltFltrPssvRgnrtionStatus 0 "notActive" 1 "active" 2 "reservedForSAEAssignment" 3 "notAvailable" ;
+VAL_ 2566749438 DslPrtcltFltrActvRgnrtionStatus 0 "notActive" 1 "active" 2 "rgnrtnNddAtmtcllyInttdActvRgnrt" 3 "notAvailable" ;
 

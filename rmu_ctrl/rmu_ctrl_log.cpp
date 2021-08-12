@@ -177,7 +177,7 @@ double DataLogger::getSensorVal(int index) {
 
 double DataLogger::getThermoVal(int subIndex) {
   int adc_val = analogRead(thermocouples[subIndex]);
-  double temp_in_c = adc_range_based_interpreter(adc_val, MIN_TEMP_C_DEGREE, MAX_TEMP_C_DEGREE);
+  double temp_in_c = rmu_utils_adc_range_based_interpreter(adc_val, MIN_TEMP_C_DEGREE, MAX_TEMP_C_DEGREE);
   Sprint("Thermo ");
   Sprintln(temp_in_c); 
   return temp_in_c;
