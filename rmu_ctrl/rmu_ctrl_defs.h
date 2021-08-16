@@ -15,7 +15,7 @@
 // the cs pin of the version after v1.1 is default to D9
 // v0.9b and v1.0 is default D10
 #define SPI_CS_PIN            9
-#define CAN_BAUD_RATE         CAN_500KBPS
+#define CAN_BAUD_RATE         CAN_250KBPS
 
 /* EGT CAN ID Def. */ 
 #define EGT_CAN_ID_0_1             0x100
