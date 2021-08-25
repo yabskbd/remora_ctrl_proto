@@ -79,7 +79,7 @@ BO_ 2566763518 AT1OG2: 8 Vector__XXX
 
 BO_ 256 TMPBB1: 8 Vector__XXX
  SG_ ThermoCouple1Temperature : 23|16@0+ (0.01,0) [0|0] "C" Vector__XXX
- SG_ ThermoCouple2Temperature : 55|16@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ ThermoCouple2Temperature : 55|16@0+ (0.01,0) [0|0] "C" Vector__XXX
 
 
 
@@ -126,6 +126,7 @@ BA_DEF_ BO_  "GenMsgRequestable" INT 0 1;
 BA_DEF_ BO_  "GenMsgSendType" ENUM  "cyclic","reserved","cyclicIfActive","reserved","reserved","reserved","reserved","reserved","noMsgSendType";
 BA_DEF_ BO_  "VFrameFormat" ENUM  "StandardCAN","ExtendedCAN","reserved","J1939PG";
 BA_DEF_ BO_  "GenMsgCycleTime" INT 0 3600000;
+BA_DEF_ BO_  "Mask" STRING ;
 BA_DEF_ BU_  "NodeLayerModules" STRING ;
 BA_DEF_ BU_  "NmStationAddress" INT 0 255;
 BA_DEF_ BU_  "NmJ1939AAC" INT 0 1;
@@ -159,6 +160,7 @@ BA_DEF_DEF_  "GenMsgRequestable" 1;
 BA_DEF_DEF_  "GenMsgSendType" "noMsgSendType";
 BA_DEF_DEF_  "VFrameFormat" "J1939PG";
 BA_DEF_DEF_  "GenMsgCycleTime" 0;
+BA_DEF_DEF_  "Mask" "";
 BA_DEF_DEF_  "NodeLayerModules" "";
 BA_DEF_DEF_  "NmStationAddress" 254;
 BA_DEF_DEF_  "NmJ1939AAC" 0;
@@ -238,6 +240,7 @@ BA_ "GenMsgSendType" BO_ 2566763518 0;
 BA_ "VFrameFormat" BO_ 2566763518 3;
 BA_ "SPN" SG_ 2566763518 Aftertreatment1ExhaustGasTemp3 3245;
 BA_ "VFrameFormat" BO_ 256 0;
+BA_ "Mask" BO_ 256 "0xFFFFFFFF";
 BA_ "NmJ1939Function" BU_ Turbocharger 133;
 BA_ "NmStationAddress" BU_ Turbocharger 2;
 BA_ "NmJ1939Function" BU_ OnBoardDataLogger 130;
