@@ -176,9 +176,25 @@ def generate_sql():
                 sql += f'COMMENT ON COLUMN {TABLE_NAME}.{signal.name} IS \'{comment}\';\n'
     print(sql)
 
+# Filters for use with candump utility
+def generate_filters():
+    can_db = get_can_db()
+    filters = []
+    for message in can_db.messages:
+        if 'Mask' in message.dbc.attributes:
+            mask = message.dbc.attributes['Mask'].value
+        else:
+            mask = '0x00ffff00'
+        filters.append(hex(message.frame_id) + ':' + mask)
+    filters_str = ','.join(filters)
+    filters_str += os.linesep
+
+    with open(os.path.join(Path(__file__).parent.resolve(), 'can_filters.txt'), 'w') as filters_file:
+        filters_file.write(filters_str)
+
 if __name__ == '__main__':
     parser = ArgumentParser(description='Parse CAN dump file into a csv')
-    parser.add_argument('action', nargs='?', default='csv', choices=['csv', 'sqlgen'],
+    parser.add_argument('action', nargs='?', default='csv', choices=['csv', 'sqlgen', 'filters'],
                         help='csv: Generate a CSV with parsed data\n' +
                         'sqlgen: Generate a postgres table to store signals defined in the remora.dbc file')
     parser.add_argument('--bucket-size', help='How often to log the latest CAN values, in milliseconds',
@@ -198,5 +214,7 @@ if __name__ == '__main__':
         generate_csv(args)
     elif args.action == 'sqlgen':
         generate_sql()
+    elif args.action == 'filters':
+        generate_filters()
     else:
         sys.exit(f'Unhandled action {args.action}')

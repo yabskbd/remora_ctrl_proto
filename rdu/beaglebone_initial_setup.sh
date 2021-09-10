@@ -78,7 +78,14 @@ sudo ln -sf /lib/systemd/system/remoracanconfigure.service /etc/systemd/system/
 echo "Adding CAN logging service..."
 echo "#!/bin/bash
 mkdir -p /var/log/candump
-candump -tA -L any | tee -a /var/log/candump/candump.log > /dev/null" | sudo tee /usr/bin/beaglebone_can_listen.sh > /dev/null
+FILTERS_FILE=/usr/local/bin/can_filters.txt
+if [[ -f $FILTERS_FILE ]]; then
+        FILTERS=,$(cat /usr/local/bin/can_filters.txt)
+else
+        $FILTERS=''
+fi
+
+candump -tA -L any$FILTERS | tee -a /var/log/candump/candump.log > /dev/null" | sudo tee /usr/bin/beaglebone_can_listen.sh > /dev/null
 
 sudo chmod +x /usr/bin/beaglebone_can_listen.sh
 
@@ -191,6 +198,49 @@ echo "#!/bin/bash
 python3 -u /usr/local/bin/canparse.py \"\$@\"" | sudo tee /usr/local/bin/canparse > /dev/null
 
 sudo chmod +x /usr/local/bin/canparse
+
+echo "Adding CAN DBC download service..."
+touch /usr/local/bin/can_filters.txt
+sudo chmod +666 /usr/local/bin/can_filters.txt
+echo "#!/bin/bash
+cd /usr/local/bin
+curl -O https://raw.githubusercontent.com/yabskbd/remora_ctrl_proto/main/rdu/remora.dbc
+if [[ $? -eq 0 ]]; then
+    python3 canparse.py filters
+    sudo systemctl restart remoracanlog.service
+fi
+cd -" | sudo tee /usr/bin/beaglebone_dbc_download.sh > /dev/null
+
+# Setup systemd timer for DBC download script
+echo "[Unit]
+Description=Download DBC file from GitHub
+After=syslog.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/beaglebone_dbc_download.sh
+
+[Install]
+WantedBy=multi-user.target" |  sudo tee /lib/systemd/system/remoradbcdownload.service > /dev/null
+
+sudo ln -sf /lib/systemd/system/remoradbcdownload.service /etc/systemd/system/
+
+echo "[Unit]
+Description=Remora DBC Downloader
+Requires=remoradbcdownload.service
+After=syslog.target
+
+[Timer]
+Unit=remoradbcdownload.service
+OnCalendar=*:0/2
+AccuracySec=15s
+
+[Install]
+WantedBy=timers.target" | sudo tee /lib/systemd/system/remoradbcdownload.timer > /dev/null
+
+sudo ln -sf /lib/systemd/system/remoradbcdownload.timer /etc/systemd/system/
+
+sudo systemctl enable remoradbcdownload.timer
 
 # Use handy BeagleBone script to partition disk to full size of SD card
 sudo /opt/scripts/tools/grow_partition.sh
