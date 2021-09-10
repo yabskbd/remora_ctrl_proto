@@ -1,5 +1,7 @@
 # remora_ctrl_proto
-Remora Control Prototype
+Remora Controls Prototype Repo
+
+This repo contains benchtest code with Arduino only. All MCU based code should go into internal repo. 
 
 
 # Libraries 
