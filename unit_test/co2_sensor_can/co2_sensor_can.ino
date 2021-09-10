@@ -4,11 +4,23 @@
  * with 250 KBPS Baud Rate. 
  * This is intended to run on Arudino Nano 
  * 
+ * Note for debuging please define macro CO2_SENSOR_CAN_ENABLE_SERIAL_PRINT 
+ * to enable Serial Print. For production code this will be undef
+ * 
+ * 
  *****************************************************************************/
 
 #include <SPI.h>
 #include <SoftwareSerial.h>
 #include "mcp2515_can.h"
+
+/*! Declare General Macros */
+#ifndef TRUE
+#define TRUE 1
+#endif
+#ifndef FALSE
+#define FALSE 0
+#endif
 
 /*! SPI pin for CAN Controller Chip */
 #define CO2_SENSOR_CAN_SPI_CS_PIN  9 
@@ -17,10 +29,11 @@
 /*! CAN BAUD RATE.
     IMPORTANT: The Hardware for this operates at 250kbps when set to the below MACRO */
 #define CO2_SENSOR_CAN_BAUD_RATE CAN_500KBPS
-/* J1939 PGN 65320 = 0xFF2800 */
+/* Use Extened CAN ID (29bit). This Macro is passed to send api */
+#define CO2_SENSOR_CAN_USE_EXTENDED_IDS    TRUE
+/* CAN ID: J1939 PGN 65320 = 0xFF2800 */
 #define CO2_SENSOR_CAN_EXTENDED_ID  0xFF2800
-/* RTR Set to zero since sending DATA Bytes */
-#define CO2_SENSOR_CAN_RTR     0
+
 
 /*! MAX CAN Data Bytes. Defined by spec */
 #define CO2_SENSOR_CAN_MAX_CAN_DATA_BYTE 8
@@ -29,8 +42,10 @@
 #define CO2_SENSOR_CAN_SW_SERIAL_RX_PIN 2
 #define CO2_SENSOR_CAN_SW_SERIAL_TX_PIN 3
 
-/*! undef when in production...define for debuging to enable for Serail Print */
-#undef CO2_SENSOR_CAN_ENABLE_SERIAL_PRINT 
+/*! Define for debuging to enable Serail Print
+  IMPORTANT: undef when in production code */
+#define CO2_SENSOR_CAN_ENABLE_SERIAL_PRINT 
+
 /*! Use the below Macros for Serail Print.
    This enabled for high level contorl to disable all Serail Print for production */
 #ifdef CO2_SENSOR_CAN_ENABLE_SERIAL_PRINT
@@ -53,17 +68,13 @@ uint32_t co2_sensor_can_ppm_conv = 10;
 
 void setup()
 {
-    co2_sensor_serial.begin(9600); //Set serial baud rate to 9600 //communicates with the CO2 sensor
-    Serial.begin(9600);            //Set serial baud rate to 9600 //provides debugging info through USB port
-    {
-    while (!Serial)
-        CO2_SENSOR_CAN_SERIAL_PRINTLN("Serail init fail, retry...");
-        delay(100);
-    };
+    /* Init communicates with the CO2 sensor */
+    co2_sensor_serial.begin(9600); //Set serial baud rate to 9600 
+    Serial.begin(9600);            //Set serial baud rate to 9600
 
+    /* Init Baud Rate with 250kbps */
     while (CAN_OK != CAN.begin(CO2_SENSOR_CAN_BAUD_RATE))
     { 
-        // init can bus : baudrate = 250kbps (CAN_500KBPS achieves and 250k baudrate)
         CO2_SENSOR_CAN_SERIAL_PRINTLN("CAN init fail, retry...");
         delay(100);
     }
@@ -101,11 +112,15 @@ void loop() {
         CO2_SENSOR_CAN_SERIAL_PRINTLN(sizeof(co2_ppm));
         /* moves data from uint32_t to char array to be TX over CAN */ 
         memcpy(can_tx_buf, &co2_ppm, sizeof(co2_ppm)); 
-        /* Send CAN Data to Bus. Data is sent as Little Endian over CAN */
+        /* Send CAN Data to Bus. 
+           IMPORTANT: Data is sent as Little Endian over CAN 
+           The order is LSB followed by MSB.
+           i.e 3750 ppm will be [A6, 0E] 
+           which will be 0x0EA6 */
+        CAN.sendMsgBuf(CO2_SENSOR_CAN_EXTENDED_ID, CO2_SENSOR_CAN_USE_EXTENDED_IDS, 
+                       CO2_SENSOR_CAN_MAX_CAN_DATA_BYTE, can_tx_buf); 
         CO2_SENSOR_CAN_SERIAL_PRINTLN("CAN BUS sendMsgBuf ok!");
-        CAN.sendMsgBuf(CO2_SENSOR_CAN_EXTENDED_ID, CO2_SENSOR_CAN_RTR, CO2_SENSOR_CAN_MAX_CAN_DATA_BYTE, can_tx_buf); 
-
-    #ifdef CO2_SENSOR_CAN_ENABLE_SERIAL_PRINT
+#ifdef CO2_SENSOR_CAN_ENABLE_SERIAL_PRINT
         /* Debug Priting of CAN MSG buf */
         for (int buf_idx = 0; buf_idx < CO2_SENSOR_CAN_MAX_CAN_DATA_BYTE; buf_idx++)
         { 
@@ -113,12 +128,10 @@ void loop() {
             CO2_SENSOR_CAN_SERIAL_PRINT("\t");
         }
         CO2_SENSOR_CAN_SERIAL_PRINTLN(" ");
-    #endif 
+#endif 
             
-    }
+    } /* End of Sensor Serial Avalibale Check */
+
     /* Loop Dealy, to query CO2 Sensor Data Every X Seconds */
     delay(CO2_SENSOR_CAN_LOOP_DELAY); 
 }
-    
-// END FILE
-
