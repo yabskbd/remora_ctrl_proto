@@ -53,7 +53,7 @@
 /*! MAX Sensor Counts */
 
 /*! Exhaust Gas Temprature Sensors */
-#define MAX_EGT_SENSORS                16
+#define MAX_EGT_SENSORS                8
 
 /*! Exhaust Gas Preassure Sensors */
 #define MAX_EGP_NEG15_15_SENSORS                0

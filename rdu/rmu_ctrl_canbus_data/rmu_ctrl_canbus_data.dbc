@@ -1,0 +1,473 @@
+VERSION ""
+
+
+NS_ : 
+	NS_DESC_
+	CM_
+	BA_DEF_
+	BA_
+	VAL_
+	CAT_DEF_
+	CAT_
+	FILTER
+	BA_DEF_DEF_
+	EV_DATA_
+	ENVVAR_DATA_
+	SGTYPE_
+	SGTYPE_VAL_
+	BA_DEF_SGTYPE_
+	BA_SGTYPE_
+	SIG_TYPE_REF_
+	VAL_TABLE_
+	SIG_GROUP_
+	SIG_VALTYPE_
+	SIGTYPE_VALTYPE_
+	BO_TX_BU_
+	BA_DEF_REL_
+	BA_REL_
+	BA_DEF_DEF_REL_
+	BU_SG_REL_
+	BU_EV_REL_
+	BU_BO_REL_
+	SG_MUL_VAL_
+
+BS_:
+
+BU_: Turbocharger OnBoardDataLogger OffBoardDiagnosticTool2 OffBoardDiagnosticTool1 FileServer ParkingBrakeController SeatControl2 FanDriveController SteeringColumnUnit CommunicationUnitRadio CommunicationUnitSatellite CommunicationUnitCellular PropulsionBatteryCharger ChassisController2 ChassisController1 EngineValveControl AuxiliaryHeater2 AuxiliaryHeater1 ClutchUnit RampControl InformationSystem1 SuspensionSystemController2 OilSensor VehicleDynamicStability ExhaustEmissionController TransmissionDisplay2 TransmissionDisplay1 ClimateControl2 WaterPumpController RearAxleSteeringController LightingOperatorControl SeatController1 IgnitionController2 IgnitionController1 TirePressureController CabController2 CabController1 PneumaticSystemController SuspensionSystemController1 HydraulicPumpController EnduranceBrakingSystem RetarderExhaustEngine2 OnBoardDiagnosticUnit HeadwayController RetarderExhaustEngine1 CabDisplay1 ManagementComputer VirtualTerminal OffVehicleGateway PowerTakeOffFront HitchControl AuxiliaryValveControl BodyController TractorTrailerBridge1 StarterSystem ElectricalSystem VehicleSecurity VehicleNavigation AerodynamicControl ElectricalChargingSystem ClimateControl1 TripRecorder InstrumentCluster SuspensionDriveAxle2 SuspensionDriveAxle1 SuspensionSteerAxle SteeringController FuelSystem CruiseControl RetarderDriveline RetarderEngine BrakesDriveAxle2 BrakesDriveAxle1 BrakesSystemController BrakesSteerAxle AxleDrive2 AxleDrive1 AxleSteering PowerTakeOff ShiftConsoleSecondary ShiftConsolePrimary Transmission2 Transmission1 Engine2 Engine1
+
+
+BO_ 2566749438 DPFC1: 8 Vector__XXX
+ SG_ DslPrtcltFltrPssvRgnrtionStatus : 8|2@1+ (1,0) [0|3] "" Vector__XXX
+ SG_ DslPrtcltFltrActvRgnrtionStatus : 10|2@1+ (1,0) [0|3] "" Vector__XXX
+
+BO_ 2566846206 IC1: 8 Vector__XXX
+ SG_ EngExhaustGasTemp : 40|16@1+ (0.03125,-273) [-273|1734.97] "deg C" Vector__XXX
+
+BO_ 2566845182 LFE: 8 Vector__XXX
+ SG_ EngFuelRate : 0|16@1+ (0.05,0) [0|3212.75] "L/h" Vector__XXX
+
+BO_ 2633929470 EI: 8 Vector__XXX
+ SG_ InstantaneousEstBrakePower : 48|16@1+ (0.5,0) [0|32127.5] "kW" Vector__XXX
+
+BO_ 2364541694 EGF1: 8 Vector__XXX
+ SG_ EngIntakeAirMassFlowRate : 16|16@1+ (0.05,0) [0|3212.75] "kg/h" Vector__XXX
+
+BO_ 2566840318 EEC3: 8 Vector__XXX
+ SG_ Aftrtratment1ExhaustGasMassFlow : 40|16@1+ (0.2,0) [0|12851] "kg/h" Vector__XXX
+
+BO_ 2364539902 EEC2: 8 Vector__XXX
+ SG_ EngPercentLoadAtCurrentSpeed : 16|8@1+ (1,0) [0|250] "%" Vector__XXX
+
+BO_ 2364540158 EEC1: 8 Vector__XXX
+ SG_ EngSpeed : 24|16@1+ (0.125,0) [0|8031.88] "rpm" Vector__XXX
+ SG_ ActualEngPercentTorque : 16|8@1+ (1,-125) [-125|125] "%" Vector__XXX
+
+BO_ 2566841342 EC1: 39 Vector__XXX
+ SG_ EngReferenceTorque : 152|16@1+ (1,0) [0|64255] "Nm" Vector__XXX
+
+BO_ 2566844926 CCVS: 8 Vector__XXX
+ SG_ WheelBasedVehicleSpeed : 8|16@1+ (0.00390625,0) [0|250.996] "km/h" Vector__XXX
+
+BO_ 2566763774 AT1IG2: 8 Vector__XXX
+ SG_ Aftertreatment1ExhaustGasTemp1 : 0|16@1+ (0.03125,-273) [-273|1734.97] "deg C" Vector__XXX
+
+BO_ 2566763262 AT1IMG: 8 Vector__XXX
+ SG_ Aftertreatment1ExhaustGasTemp2 : 0|16@1+ (0.03125,-273) [-273|1734.97] "deg C" Vector__XXX
+
+BO_ 2566763518 AT1OG2: 8 Vector__XXX
+ SG_ Aftertreatment1ExhaustGasTemp3 : 0|16@1+ (0.03125,-273) [-273|1734.97] "deg C" Vector__XXX
+
+BO_ 511 EGT_DATA: 8 Vector__XXX
+ SG_ EGT_DATA_0 : 7|32@0- (0.01,0) [-500|1200] "C" Vector__XXX
+ SG_ EGT_DATA_1 : 39|32@0- (0.01,0) [-500|1200] "C" Vector__XXX
+
+BO_ 256 EGT_DATA_0: 8 Vector__XXX
+ SG_ EGT_0 : 7|32@0- (0.01,0) [-500|1200] "C" Vector__XXX
+ SG_ EGT_1 : 39|32@0- (0.01,0) [-500|1200] "C" Vector__XXX
+
+BO_ 257 EGT_DATA_1: 8 Vector__XXX
+ SG_ EGT_2 : 7|32@0- (0.01,0) [-500|1200] "C" Vector__XXX
+ SG_ EGT_3 : 39|32@0- (0.01,0) [-500|1200] "C" Vector__XXX
+
+
+
+CM_ BO_ 2566749438 "Diesel Particulate Filter Control 1";
+CM_ SG_ 2566749438 DslPrtcltFltrPssvRgnrtionStatus "Indicates the state of diesel particulate filter passive regeneration.";
+CM_ SG_ 2566749438 DslPrtcltFltrActvRgnrtionStatus "Indicates the state of diesel particulate filter active regeneration.";
+CM_ BO_ 2566846206 "Intake/Exhaust Conditions 1";
+CM_ SG_ 2566846206 EngExhaustGasTemp "Temperature of combustion byproducts leaving the engine.
+";
+CM_ BO_ 2566845182 "Fuel Economy (Liquid)";
+CM_ SG_ 2566845182 EngFuelRate "Amount of fuel consumed by engine per unit of time.";
+CM_ BO_ 2633929470 "Engine Information";
+CM_ SG_ 2633929470 InstantaneousEstBrakePower "Estimate of the power developed by the engine.";
+CM_ BO_ 2364541694 "Engine Gas Flow Rate";
+CM_ SG_ 2364541694 EngIntakeAirMassFlowRate "Mass flow rate of fresh air entering the engine air intake, before any EGR mixer, if used.";
+CM_ BO_ 2566840318 "Electronic Engine Controller 3";
+CM_ SG_ 2566840318 Aftrtratment1ExhaustGasMassFlow "Measured/calculated exhaust gas mass upstream of the aftertreatment system in exhaust bank 1 and 2.";
+CM_ BO_ 2364539902 "Electronic Engine Controller 2";
+CM_ SG_ 2364539902 EngPercentLoadAtCurrentSpeed "The ratio of actual engine percent torque (indicated) to maximum indicated torque available at the current engine speed,";
+CM_ BO_ 2364540158 "Electronic Engine Controller 1";
+CM_ SG_ 2364540158 EngSpeed "Actual engine speed which is calculated over a minimum crankshaft angle of 720 degrees divided by the number of cylinders.";
+CM_ SG_ 2364540158 ActualEngPercentTorque "The calculated output torque of the engine.";
+CM_ BO_ 2566841342 "Engine Configuration 1";
+CM_ SG_ 2566841342 EngReferenceTorque "This parameter is the 100% reference value for all defined indicated engine torque parameters.";
+CM_ BO_ 2566844926 "Cruise Control/Vehicle Speed";
+CM_ SG_ 2566844926 WheelBasedVehicleSpeed "Speed of the vehicle as calculated from wheel or tailshaft speed.";
+CM_ BO_ 2566763774 "Aftertreatment 1 Intake Gas 2";
+CM_ SG_ 2566763774 Aftertreatment1ExhaustGasTemp1 "The reading from the exhaust gas temperature sensor located farthest upstream in the aftertreatment system in exhaust bank 1.
+";
+CM_ BO_ 2566763262 "Aftertreatment 1 Intermediate Gas";
+CM_ SG_ 2566763262 Aftertreatment1ExhaustGasTemp2 "The reading from the exhaust gas temperature sensor located midstream of the other two temperature sensors in the";
+CM_ BO_ 2566763518 "Aftertreatment 1 Outlet Gas 2";
+CM_ SG_ 2566763518 Aftertreatment1ExhaustGasTemp3 "The reading from the exhaust gas temperature sensor located farthest downstream in the aftertreatment system in";
+BA_DEF_ SG_  "SigType" ENUM  "Default","Range","RangeSigned","ASCII","Discrete","Control","ReferencePGN","DTC","StringDelimiter","StringLength","StringLengthControl";
+BA_DEF_ SG_  "GenSigStartValue" INT 0 10000;
+BA_DEF_ SG_  "GenSigSendType" ENUM  "Cyclic","OnWrite","reserved","OnChange","reserved","reserved","reserved","NoSigSendType";
+BA_DEF_ SG_  "GenSigILSupport" ENUM  "Yes","No";
+BA_DEF_ SG_  "GenSigEVName" STRING ;
+BA_DEF_ SG_  "SPN" INT 0 524287;
+BA_DEF_ BO_  "GenMsgStartDelayTime" INT 0 100000;
+BA_DEF_ BO_  "GenMsgILSupport" ENUM  "Yes","No";
+BA_DEF_ BO_  "GenMsgDelayTime" INT 0 1000;
+BA_DEF_ BO_  "GenMsgRequestable" INT 0 1;
+BA_DEF_ BO_  "GenMsgSendType" ENUM  "cyclic","reserved","cyclicIfActive","reserved","reserved","reserved","reserved","reserved","noMsgSendType";
+BA_DEF_ BO_  "VFrameFormat" ENUM  "StandardCAN","ExtendedCAN","reserved","J1939PG";
+BA_DEF_ BO_  "GenMsgCycleTime" INT 0 3600000;
+BA_DEF_ BU_  "NodeLayerModules" STRING ;
+BA_DEF_ BU_  "NmStationAddress" INT 0 255;
+BA_DEF_ BU_  "NmJ1939AAC" INT 0 1;
+BA_DEF_ BU_  "NmJ1939IndustryGroup" INT 0 7;
+BA_DEF_ BU_  "NmJ1939System" INT 0 127;
+BA_DEF_ BU_  "NmJ1939SystemInstance" INT 0 15;
+BA_DEF_ BU_  "NmJ1939Function" INT 0 255;
+BA_DEF_ BU_  "NmJ1939FunctionInstance" INT 0 7;
+BA_DEF_ BU_  "NmJ1939ECUInstance" INT 0 3;
+BA_DEF_ BU_  "NmJ1939ManufacturerCode" INT 0 2047;
+BA_DEF_ BU_  "NmJ1939IdentityNumber" INT 0 2097151;
+BA_DEF_ BU_  "ECU" STRING ;
+BA_DEF_  "DatabaseVersion" STRING ;
+BA_DEF_  "BusType" STRING ;
+BA_DEF_  "ProtocolType" STRING ;
+BA_DEF_  "SAE_J1939_75_SpecVersion" STRING ;
+BA_DEF_  "SAE_J1939_21_SpecVersion" STRING ;
+BA_DEF_  "SAE_J1939_73_SpecVersion" STRING ;
+BA_DEF_  "SAE_J1939_71_SpecVersion" STRING ;
+BA_DEF_ SG_  "SystemSignalLongSymbol" STRING ;
+BA_DEF_DEF_  "SigType" "Default";
+BA_DEF_DEF_  "GenSigStartValue" 0;
+BA_DEF_DEF_  "GenSigSendType" "NoSigSendType";
+BA_DEF_DEF_  "GenSigILSupport" "Yes";
+BA_DEF_DEF_  "GenSigEVName" "Env@Nodename_@Signame";
+BA_DEF_DEF_  "SPN" 0;
+BA_DEF_DEF_  "GenMsgStartDelayTime" 0;
+BA_DEF_DEF_  "GenMsgILSupport" "Yes";
+BA_DEF_DEF_  "GenMsgDelayTime" 0;
+BA_DEF_DEF_  "GenMsgRequestable" 1;
+BA_DEF_DEF_  "GenMsgSendType" "noMsgSendType";
+BA_DEF_DEF_  "VFrameFormat" "J1939PG";
+BA_DEF_DEF_  "GenMsgCycleTime" 0;
+BA_DEF_DEF_  "NodeLayerModules" "";
+BA_DEF_DEF_  "NmStationAddress" 254;
+BA_DEF_DEF_  "NmJ1939AAC" 0;
+BA_DEF_DEF_  "NmJ1939IndustryGroup" 0;
+BA_DEF_DEF_  "NmJ1939System" 0;
+BA_DEF_DEF_  "NmJ1939SystemInstance" 0;
+BA_DEF_DEF_  "NmJ1939Function" 0;
+BA_DEF_DEF_  "NmJ1939FunctionInstance" 0;
+BA_DEF_DEF_  "NmJ1939ECUInstance" 0;
+BA_DEF_DEF_  "NmJ1939ManufacturerCode" 0;
+BA_DEF_DEF_  "NmJ1939IdentityNumber" 0;
+BA_DEF_DEF_  "ECU" "";
+BA_DEF_DEF_  "DatabaseVersion" "";
+BA_DEF_DEF_  "BusType" "";
+BA_DEF_DEF_  "ProtocolType" "";
+BA_DEF_DEF_  "SAE_J1939_75_SpecVersion" "";
+BA_DEF_DEF_  "SAE_J1939_21_SpecVersion" "";
+BA_DEF_DEF_  "SAE_J1939_73_SpecVersion" "";
+BA_DEF_DEF_  "SAE_J1939_71_SpecVersion" "";
+BA_DEF_DEF_  "SystemSignalLongSymbol" "";
+BA_ "SAE_J1939_71_SpecVersion" "2009-09";
+BA_ "SAE_J1939_73_SpecVersion" "2009-09";
+BA_ "SAE_J1939_21_SpecVersion" "2006-10";
+BA_ "SAE_J1939_75_SpecVersion" "2005-10";
+BA_ "ProtocolType" "J1939";
+BA_ "BusType" "CAN";
+BA_ "DatabaseVersion" "7.2";
+BA_ "VFrameFormat" BO_ 2566749438 3;
+BA_ "SPN" SG_ 2566749438 DslPrtcltFltrPssvRgnrtionStatus 3699;
+BA_ "SPN" SG_ 2566749438 DslPrtcltFltrActvRgnrtionStatus 3700;
+BA_ "GenMsgCycleTime" BO_ 2566846206 500;
+BA_ "GenMsgSendType" BO_ 2566846206 0;
+BA_ "VFrameFormat" BO_ 2566846206 3;
+BA_ "SPN" SG_ 2566846206 EngExhaustGasTemp 173;
+BA_ "GenMsgCycleTime" BO_ 2566845182 100;
+BA_ "GenMsgSendType" BO_ 2566845182 0;
+BA_ "VFrameFormat" BO_ 2566845182 3;
+BA_ "SPN" SG_ 2566845182 EngFuelRate 183;
+BA_ "GenMsgCycleTime" BO_ 2633929470 100;
+BA_ "GenMsgSendType" BO_ 2633929470 0;
+BA_ "VFrameFormat" BO_ 2633929470 3;
+BA_ "SPN" SG_ 2633929470 InstantaneousEstBrakePower 1242;
+BA_ "GenMsgCycleTime" BO_ 2364541694 50;
+BA_ "GenMsgSendType" BO_ 2364541694 0;
+BA_ "VFrameFormat" BO_ 2364541694 3;
+BA_ "SPN" SG_ 2364541694 EngIntakeAirMassFlowRate 132;
+BA_ "GenMsgCycleTime" BO_ 2566840318 250;
+BA_ "GenMsgSendType" BO_ 2566840318 0;
+BA_ "VFrameFormat" BO_ 2566840318 3;
+BA_ "SPN" SG_ 2566840318 Aftrtratment1ExhaustGasMassFlow 3236;
+BA_ "GenMsgCycleTime" BO_ 2364539902 50;
+BA_ "GenMsgSendType" BO_ 2364539902 0;
+BA_ "VFrameFormat" BO_ 2364539902 3;
+BA_ "SPN" SG_ 2364539902 EngPercentLoadAtCurrentSpeed 92;
+BA_ "GenMsgCycleTime" BO_ 2364540158 100;
+BA_ "GenMsgSendType" BO_ 2364540158 0;
+BA_ "VFrameFormat" BO_ 2364540158 3;
+BA_ "SPN" SG_ 2364540158 EngSpeed 190;
+BA_ "SPN" SG_ 2364540158 ActualEngPercentTorque 513;
+BA_ "GenMsgSendType" BO_ 2566841342 8;
+BA_ "VFrameFormat" BO_ 2566841342 3;
+BA_ "SPN" SG_ 2566841342 EngReferenceTorque 544;
+BA_ "GenMsgCycleTime" BO_ 2566844926 100;
+BA_ "GenMsgSendType" BO_ 2566844926 0;
+BA_ "VFrameFormat" BO_ 2566844926 3;
+BA_ "SPN" SG_ 2566844926 WheelBasedVehicleSpeed 84;
+BA_ "GenMsgCycleTime" BO_ 2566763774 500;
+BA_ "GenMsgSendType" BO_ 2566763774 0;
+BA_ "VFrameFormat" BO_ 2566763774 3;
+BA_ "SPN" SG_ 2566763774 Aftertreatment1ExhaustGasTemp1 3241;
+BA_ "GenMsgCycleTime" BO_ 2566763262 500;
+BA_ "GenMsgSendType" BO_ 2566763262 0;
+BA_ "VFrameFormat" BO_ 2566763262 3;
+BA_ "SPN" SG_ 2566763262 Aftertreatment1ExhaustGasTemp2 3249;
+BA_ "GenMsgCycleTime" BO_ 2566763518 500;
+BA_ "GenMsgSendType" BO_ 2566763518 0;
+BA_ "VFrameFormat" BO_ 2566763518 3;
+BA_ "SPN" SG_ 2566763518 Aftertreatment1ExhaustGasTemp3 3245;
+BA_ "VFrameFormat" BO_ 511 0;
+BA_ "VFrameFormat" BO_ 256 0;
+BA_ "VFrameFormat" BO_ 257 0;
+BA_ "NmJ1939Function" BU_ Turbocharger 133;
+BA_ "NmStationAddress" BU_ Turbocharger 2;
+BA_ "NmJ1939Function" BU_ OnBoardDataLogger 130;
+BA_ "NmStationAddress" BU_ OnBoardDataLogger 251;
+BA_ "NmJ1939FunctionInstance" BU_ OffBoardDiagnosticTool2 1;
+BA_ "NmJ1939Function" BU_ OffBoardDiagnosticTool2 129;
+BA_ "NmStationAddress" BU_ OffBoardDiagnosticTool2 250;
+BA_ "NmJ1939FunctionInstance" BU_ OffBoardDiagnosticTool1 0;
+BA_ "NmJ1939Function" BU_ OffBoardDiagnosticTool1 129;
+BA_ "NmStationAddress" BU_ OffBoardDiagnosticTool1 249;
+BA_ "NmJ1939Function" BU_ FileServer 61;
+BA_ "NmStationAddress" BU_ FileServer 248;
+BA_ "NmJ1939Function" BU_ ParkingBrakeController 9;
+BA_ "NmStationAddress" BU_ ParkingBrakeController 80;
+BA_ "NmJ1939Function" BU_ SeatControl2 40;
+BA_ "NmStationAddress" BU_ SeatControl2 79;
+BA_ "NmJ1939Function" BU_ FanDriveController 58;
+BA_ "NmStationAddress" BU_ FanDriveController 78;
+BA_ "NmJ1939Function" BU_ SteeringColumnUnit 57;
+BA_ "NmStationAddress" BU_ SteeringColumnUnit 77;
+BA_ "NmJ1939Function" BU_ CommunicationUnitRadio 56;
+BA_ "NmStationAddress" BU_ CommunicationUnitRadio 76;
+BA_ "NmJ1939Function" BU_ CommunicationUnitSatellite 55;
+BA_ "NmStationAddress" BU_ CommunicationUnitSatellite 75;
+BA_ "NmJ1939Function" BU_ CommunicationUnitCellular 54;
+BA_ "NmStationAddress" BU_ CommunicationUnitCellular 74;
+BA_ "NmJ1939Function" BU_ PropulsionBatteryCharger 31;
+BA_ "NmStationAddress" BU_ PropulsionBatteryCharger 73;
+BA_ "NmJ1939FunctionInstance" BU_ ChassisController2 1;
+BA_ "NmJ1939Function" BU_ ChassisController2 52;
+BA_ "NmStationAddress" BU_ ChassisController2 72;
+BA_ "NmJ1939FunctionInstance" BU_ ChassisController1 0;
+BA_ "NmJ1939Function" BU_ ChassisController1 52;
+BA_ "NmStationAddress" BU_ ChassisController1 71;
+BA_ "NmJ1939Function" BU_ EngineValveControl 63;
+BA_ "NmStationAddress" BU_ EngineValveControl 70;
+BA_ "NmJ1939FunctionInstance" BU_ AuxiliaryHeater2 1;
+BA_ "NmJ1939Function" BU_ AuxiliaryHeater2 50;
+BA_ "NmStationAddress" BU_ AuxiliaryHeater2 69;
+BA_ "NmJ1939FunctionInstance" BU_ AuxiliaryHeater1 0;
+BA_ "NmJ1939Function" BU_ AuxiliaryHeater1 50;
+BA_ "NmStationAddress" BU_ AuxiliaryHeater1 68;
+BA_ "NmJ1939Function" BU_ ClutchUnit 49;
+BA_ "NmStationAddress" BU_ ClutchUnit 67;
+BA_ "NmJ1939Function" BU_ RampControl 48;
+BA_ "NmStationAddress" BU_ RampControl 66;
+BA_ "NmJ1939Function" BU_ InformationSystem1 47;
+BA_ "NmStationAddress" BU_ InformationSystem1 65;
+BA_ "NmJ1939Function" BU_ SuspensionSystemController2 35;
+BA_ "NmStationAddress" BU_ SuspensionSystemController2 64;
+BA_ "NmJ1939Function" BU_ OilSensor 46;
+BA_ "NmStationAddress" BU_ OilSensor 63;
+BA_ "NmJ1939Function" BU_ VehicleDynamicStability 45;
+BA_ "NmStationAddress" BU_ VehicleDynamicStability 62;
+BA_ "NmJ1939Function" BU_ ExhaustEmissionController 44;
+BA_ "NmStationAddress" BU_ ExhaustEmissionController 61;
+BA_ "NmJ1939Function" BU_ TransmissionDisplay2 43;
+BA_ "NmStationAddress" BU_ TransmissionDisplay2 60;
+BA_ "NmJ1939Function" BU_ TransmissionDisplay1 43;
+BA_ "NmStationAddress" BU_ TransmissionDisplay1 59;
+BA_ "NmJ1939Function" BU_ ClimateControl2 21;
+BA_ "NmStationAddress" BU_ ClimateControl2 58;
+BA_ "NmJ1939Function" BU_ WaterPumpController 42;
+BA_ "NmStationAddress" BU_ WaterPumpController 57;
+BA_ "NmStationAddress" BU_ RearAxleSteeringController 56;
+BA_ "NmJ1939Function" BU_ LightingOperatorControl 41;
+BA_ "NmStationAddress" BU_ LightingOperatorControl 55;
+BA_ "NmJ1939Function" BU_ SeatController1 40;
+BA_ "NmStationAddress" BU_ SeatController1 54;
+BA_ "NmJ1939FunctionInstance" BU_ IgnitionController2 1;
+BA_ "NmJ1939Function" BU_ IgnitionController2 39;
+BA_ "NmStationAddress" BU_ IgnitionController2 53;
+BA_ "NmJ1939FunctionInstance" BU_ IgnitionController1 0;
+BA_ "NmJ1939Function" BU_ IgnitionController1 39;
+BA_ "NmStationAddress" BU_ IgnitionController1 52;
+BA_ "NmJ1939Function" BU_ TirePressureController 38;
+BA_ "NmStationAddress" BU_ TirePressureController 51;
+BA_ "NmJ1939Function" BU_ CabController2 37;
+BA_ "NmStationAddress" BU_ CabController2 50;
+BA_ "NmJ1939Function" BU_ CabController1 37;
+BA_ "NmStationAddress" BU_ CabController1 49;
+BA_ "NmJ1939Function" BU_ PneumaticSystemController 36;
+BA_ "NmStationAddress" BU_ PneumaticSystemController 48;
+BA_ "NmJ1939Function" BU_ SuspensionSystemController1 35;
+BA_ "NmStationAddress" BU_ SuspensionSystemController1 47;
+BA_ "NmJ1939Function" BU_ HydraulicPumpController 34;
+BA_ "NmStationAddress" BU_ HydraulicPumpController 46;
+BA_ "NmJ1939Function" BU_ EnduranceBrakingSystem 64;
+BA_ "NmStationAddress" BU_ EnduranceBrakingSystem 45;
+BA_ "NmJ1939FunctionInstance" BU_ RetarderExhaustEngine2 1;
+BA_ "NmJ1939Function" BU_ RetarderExhaustEngine2 12;
+BA_ "NmStationAddress" BU_ RetarderExhaustEngine2 44;
+BA_ "NmJ1939FunctionInstance" BU_ OnBoardDiagnosticUnit 0;
+BA_ "NmJ1939Function" BU_ OnBoardDiagnosticUnit 62;
+BA_ "NmStationAddress" BU_ OnBoardDiagnosticUnit 43;
+BA_ "NmJ1939Function" BU_ HeadwayController 32;
+BA_ "NmStationAddress" BU_ HeadwayController 42;
+BA_ "NmJ1939Function" BU_ RetarderExhaustEngine1 12;
+BA_ "NmStationAddress" BU_ RetarderExhaustEngine1 41;
+BA_ "NmJ1939Function" BU_ CabDisplay1 60;
+BA_ "NmStationAddress" BU_ CabDisplay1 40;
+BA_ "NmJ1939Function" BU_ ManagementComputer 30;
+BA_ "NmStationAddress" BU_ ManagementComputer 39;
+BA_ "NmJ1939Function" BU_ VirtualTerminal 29;
+BA_ "NmStationAddress" BU_ VirtualTerminal 38;
+BA_ "NmJ1939Function" BU_ OffVehicleGateway 28;
+BA_ "NmStationAddress" BU_ OffVehicleGateway 37;
+BA_ "NmJ1939Function" BU_ PowerTakeOffFront 27;
+BA_ "NmStationAddress" BU_ PowerTakeOffFront 36;
+BA_ "NmStationAddress" BU_ HitchControl 35;
+BA_ "NmStationAddress" BU_ AuxiliaryValveControl 34;
+BA_ "NmJ1939Function" BU_ BodyController 26;
+BA_ "NmStationAddress" BU_ BodyController 33;
+BA_ "NmStationAddress" BU_ TractorTrailerBridge1 32;
+BA_ "NmJ1939Function" BU_ StarterSystem 59;
+BA_ "NmStationAddress" BU_ StarterSystem 31;
+BA_ "NmJ1939Function" BU_ ElectricalSystem 67;
+BA_ "NmStationAddress" BU_ ElectricalSystem 30;
+BA_ "NmJ1939Function" BU_ VehicleSecurity 24;
+BA_ "NmStationAddress" BU_ VehicleSecurity 29;
+BA_ "NmJ1939Function" BU_ VehicleNavigation 23;
+BA_ "NmStationAddress" BU_ VehicleNavigation 28;
+BA_ "NmJ1939Function" BU_ AerodynamicControl 22;
+BA_ "NmStationAddress" BU_ AerodynamicControl 27;
+BA_ "NmJ1939Function" BU_ ElectricalChargingSystem 53;
+BA_ "NmStationAddress" BU_ ElectricalChargingSystem 26;
+BA_ "NmJ1939ECUInstance" BU_ ClimateControl1 0;
+BA_ "NmJ1939FunctionInstance" BU_ ClimateControl1 0;
+BA_ "NmJ1939Function" BU_ ClimateControl1 21;
+BA_ "NmStationAddress" BU_ ClimateControl1 25;
+BA_ "NmJ1939Function" BU_ TripRecorder 20;
+BA_ "NmStationAddress" BU_ TripRecorder 24;
+BA_ "NmJ1939Function" BU_ InstrumentCluster 19;
+BA_ "NmStationAddress" BU_ InstrumentCluster 23;
+BA_ "NmJ1939FunctionInstance" BU_ SuspensionDriveAxle2 1;
+BA_ "NmJ1939Function" BU_ SuspensionDriveAxle2 18;
+BA_ "NmStationAddress" BU_ SuspensionDriveAxle2 22;
+BA_ "NmJ1939FunctionInstance" BU_ SuspensionDriveAxle1 0;
+BA_ "NmJ1939Function" BU_ SuspensionDriveAxle1 18;
+BA_ "NmStationAddress" BU_ SuspensionDriveAxle1 21;
+BA_ "NmJ1939Function" BU_ SuspensionSteerAxle 17;
+BA_ "NmStationAddress" BU_ SuspensionSteerAxle 20;
+BA_ "NmJ1939Function" BU_ SteeringController 16;
+BA_ "NmStationAddress" BU_ SteeringController 19;
+BA_ "NmJ1939Function" BU_ FuelSystem 15;
+BA_ "NmStationAddress" BU_ FuelSystem 18;
+BA_ "NmJ1939Function" BU_ CruiseControl 14;
+BA_ "NmStationAddress" BU_ CruiseControl 17;
+BA_ "NmJ1939Function" BU_ RetarderDriveline 13;
+BA_ "NmStationAddress" BU_ RetarderDriveline 16;
+BA_ "NmJ1939Function" BU_ RetarderEngine 12;
+BA_ "NmStationAddress" BU_ RetarderEngine 15;
+BA_ "NmJ1939FunctionInstance" BU_ BrakesDriveAxle2 1;
+BA_ "NmJ1939Function" BU_ BrakesDriveAxle2 11;
+BA_ "NmJ1939System" BU_ BrakesDriveAxle2 0;
+BA_ "NmJ1939IndustryGroup" BU_ BrakesDriveAxle2 0;
+BA_ "NmStationAddress" BU_ BrakesDriveAxle2 14;
+BA_ "NmJ1939FunctionInstance" BU_ BrakesDriveAxle1 0;
+BA_ "NmJ1939Function" BU_ BrakesDriveAxle1 11;
+BA_ "NmJ1939System" BU_ BrakesDriveAxle1 0;
+BA_ "NmJ1939IndustryGroup" BU_ BrakesDriveAxle1 0;
+BA_ "NmStationAddress" BU_ BrakesDriveAxle1 13;
+BA_ "NmJ1939Function" BU_ BrakesSystemController 9;
+BA_ "NmJ1939System" BU_ BrakesSystemController 0;
+BA_ "NmJ1939IndustryGroup" BU_ BrakesSystemController 0;
+BA_ "NmStationAddress" BU_ BrakesSystemController 11;
+BA_ "NmJ1939Function" BU_ BrakesSteerAxle 10;
+BA_ "NmJ1939System" BU_ BrakesSteerAxle 0;
+BA_ "NmJ1939IndustryGroup" BU_ BrakesSteerAxle 0;
+BA_ "NmStationAddress" BU_ BrakesSteerAxle 12;
+BA_ "NmJ1939FunctionInstance" BU_ AxleDrive2 1;
+BA_ "NmJ1939Function" BU_ AxleDrive2 8;
+BA_ "NmJ1939System" BU_ AxleDrive2 0;
+BA_ "NmJ1939IndustryGroup" BU_ AxleDrive2 0;
+BA_ "NmStationAddress" BU_ AxleDrive2 10;
+BA_ "NmJ1939FunctionInstance" BU_ AxleDrive1 0;
+BA_ "NmJ1939Function" BU_ AxleDrive1 8;
+BA_ "NmJ1939System" BU_ AxleDrive1 0;
+BA_ "NmJ1939IndustryGroup" BU_ AxleDrive1 0;
+BA_ "NmStationAddress" BU_ AxleDrive1 9;
+BA_ "NmJ1939Function" BU_ AxleSteering 7;
+BA_ "NmJ1939System" BU_ AxleSteering 0;
+BA_ "NmJ1939IndustryGroup" BU_ AxleSteering 0;
+BA_ "NmStationAddress" BU_ AxleSteering 8;
+BA_ "NmJ1939Function" BU_ PowerTakeOff 6;
+BA_ "NmJ1939System" BU_ PowerTakeOff 0;
+BA_ "NmJ1939IndustryGroup" BU_ PowerTakeOff 0;
+BA_ "NmStationAddress" BU_ PowerTakeOff 7;
+BA_ "NmJ1939FunctionInstance" BU_ ShiftConsoleSecondary 1;
+BA_ "NmJ1939Function" BU_ ShiftConsoleSecondary 5;
+BA_ "NmJ1939System" BU_ ShiftConsoleSecondary 0;
+BA_ "NmJ1939IndustryGroup" BU_ ShiftConsoleSecondary 0;
+BA_ "NmStationAddress" BU_ ShiftConsoleSecondary 6;
+BA_ "NmJ1939FunctionInstance" BU_ ShiftConsolePrimary 0;
+BA_ "NmJ1939Function" BU_ ShiftConsolePrimary 5;
+BA_ "NmJ1939System" BU_ ShiftConsolePrimary 0;
+BA_ "NmJ1939IndustryGroup" BU_ ShiftConsolePrimary 0;
+BA_ "NmStationAddress" BU_ ShiftConsolePrimary 5;
+BA_ "NmJ1939ECUInstance" BU_ Transmission2 1;
+BA_ "NmJ1939FunctionInstance" BU_ Transmission2 0;
+BA_ "NmJ1939Function" BU_ Transmission2 3;
+BA_ "NmJ1939System" BU_ Transmission2 0;
+BA_ "NmJ1939IndustryGroup" BU_ Transmission2 0;
+BA_ "NmStationAddress" BU_ Transmission2 4;
+BA_ "NmJ1939ECUInstance" BU_ Transmission1 0;
+BA_ "NmJ1939FunctionInstance" BU_ Transmission1 0;
+BA_ "NmJ1939Function" BU_ Transmission1 3;
+BA_ "NmJ1939System" BU_ Transmission1 0;
+BA_ "NmJ1939IndustryGroup" BU_ Transmission1 0;
+BA_ "NmStationAddress" BU_ Transmission1 3;
+BA_ "NmJ1939FunctionInstance" BU_ Engine2 1;
+BA_ "NmJ1939Function" BU_ Engine2 0;
+BA_ "NmJ1939System" BU_ Engine2 0;
+BA_ "NmJ1939IndustryGroup" BU_ Engine2 0;
+BA_ "NmStationAddress" BU_ Engine2 1;
+BA_ "NmJ1939FunctionInstance" BU_ Engine1 0;
+BA_ "NmJ1939Function" BU_ Engine1 0;
+BA_ "NmJ1939System" BU_ Engine1 0;
+BA_ "NmJ1939IndustryGroup" BU_ Engine1 0;
+BA_ "NmStationAddress" BU_ Engine1 0;
+VAL_ 2566749438 DslPrtcltFltrPssvRgnrtionStatus 0 "notActive" 1 "active" 2 "reservedForSAEAssignment" 3 "notAvailable" ;
+VAL_ 2566749438 DslPrtcltFltrActvRgnrtionStatus 0 "notActive" 1 "active" 2 "rgnrtnNddAtmtcllyInttdActvRgnrt" 3 "notAvailable" ;
+
