@@ -3,9 +3,7 @@ void setup() {
   Serial.begin(9600);
 }
 
-
-
-#define SENSOR_PIN A4
+#define SENSOR_PIN A0
 #define RMU_CTRL_DEFS_MAX_VOLTAGE 5
 #define ADC_MAX_RESOLUTION_IN_BITS     10
 #define ADC_MAX_RESOLUTION             ((1 << ADC_MAX_RESOLUTION_IN_BITS) - 1)
@@ -32,6 +30,9 @@ rmu_utils_adc_range_based_interpreter(int adc_val, double adc_range, double min_
 void loop() {
   // put your main code here, to run repeatedly:
    int adc_val = analogRead(SENSOR_PIN);
-   Serial.println(rmu_utils_adc_range_based_interpreter(adc_val, RMU_CTRL_SENSORS_EGP_ADC_RESOLUTION, -14.7, 15,
-                                                          RMU_CTRL_SENSORS_EGP_ADC_VAL_OFFSET));
+   Serial.print(millis());
+   Serial.print(",");
+   Serial.println( rmu_utils_adc_range_based_interpreter(adc_val, RMU_CTRL_SENSORS_EGP_ADC_RESOLUTION, 0, 5000,
+                                                         RMU_CTRL_SENSORS_EGP_ADC_VAL_OFFSET));
+   delay(500);                                                 
 }
