@@ -14,6 +14,7 @@ void setup() {
            ADC_MAX_RESOLUTION)
 #define RMU_CTRL_SENSORS_EGP_ADC_VAL_OFFSET                                                                            \
   (double)((RMU_CTRL_SENSORS_EGP_MIN_VOLTAGE / RMU_CTRL_DEFS_MAX_VOLTAGE) * ADC_MAX_RESOLUTION)
+#define HIGH_PRESSURE_SENSOR_CALIBRATION_OFFSET_PSI 22
 
 double
 rmu_utils_adc_range_based_interpreter(int adc_val, double adc_range, double min_range, double max_range, double offset)
@@ -33,6 +34,6 @@ void loop() {
    Serial.print(millis());
    Serial.print(",");
    Serial.println( rmu_utils_adc_range_based_interpreter(adc_val, RMU_CTRL_SENSORS_EGP_ADC_RESOLUTION, 0, 5000,
-                                                         RMU_CTRL_SENSORS_EGP_ADC_VAL_OFFSET));
+                                                         RMU_CTRL_SENSORS_EGP_ADC_VAL_OFFSET) + HIGH_PRESSURE_SENSOR_CALIBRATION_OFFSET_PSI);
    delay(500);                                                 
 }
