@@ -34,6 +34,13 @@
 /* CAN ID: J1939 PGN 65320 = 0xFF2800 */
 #define CO2_SENSOR_CAN_EXTENDED_ID  0xFF2800
 
+/* PPM to percent:
+ x(%) = x(ppm) / 10,000
+ 
+ Ambient C02 PPM
+   200 - 400 PPM
+ */
+
 
 /*! MAX CAN Data Bytes. Defined by spec */
 #define CO2_SENSOR_CAN_MAX_CAN_DATA_BYTE 8
@@ -92,15 +99,17 @@ void loop() {
     if (co2_sensor_serial.available() > 0) {
         /* Read avail incoming byte */
         co2_sensor_serial_rx = co2_sensor_serial.readString();
+        co2_sensor_serial_rx.trim();
         /* Debug Print for RX data from CO2 Serial */
-        CO2_SENSOR_CAN_SERIAL_PRINT("rx: ");
+        CO2_SENSOR_CAN_SERIAL_PRINT("Trimmed rx: ");
         CO2_SENSOR_CAN_SERIAL_PRINTLN(co2_sensor_serial_rx);
- 
         /* Rx Data ex:  'Z 00382'
            grabs the last 5 digits of the returned value
            drops the " Z " or similar prefix
            only keeps the value in decimal form */ 
         String incomingByteShort = co2_sensor_serial_rx.substring(co2_sensor_serial_rx.length() - 5);
+        CO2_SENSOR_CAN_SERIAL_PRINT("Final String for INT: ");
+        CO2_SENSOR_CAN_SERIAL_PRINTLN(incomingByteShort);
         /* Convert RX string to unsinged int */
         uint32_t co2_ppm = (uint32_t)incomingByteShort.toInt();
         /* Convert Serail RX data to PPM */
