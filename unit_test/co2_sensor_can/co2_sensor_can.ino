@@ -51,7 +51,7 @@
 
 /*! Define for debuging to enable Serail Print
   IMPORTANT: undef when in production code */
-#define CO2_SENSOR_CAN_ENABLE_SERIAL_PRINT 
+#undef CO2_SENSOR_CAN_ENABLE_SERIAL_PRINT 
 
 /*! Use the below Macros for Serail Print.
    This enabled for high level contorl to disable all Serail Print for production */
