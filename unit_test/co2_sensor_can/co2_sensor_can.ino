@@ -11,6 +11,7 @@
  *****************************************************************************/
 
 #include <SPI.h>
+#include <EEPROM.h>
 #include <SoftwareSerial.h>
 #include "mcp2515_can.h"
 
@@ -34,6 +35,12 @@
 /* CAN ID: J1939 PGN 65320 = 0xFF2800 */
 #define CO2_SENSOR_CAN_EXTENDED_ID  0xFF2800
 
+#define CO2_SENSOR_CHANGE_NEW_CAN_ID    0xFF28FF
+#define CO2_SENSOR_CHANGE_CONV_PPM      0xFF28FE
+
+#define CO2_SENSOR_CHANGE_NEW_CAN_ID_ACK    0xFF287F
+#define CO2_SENSOR_CHANGE_CONV_PPM_ACK      0xFF287E
+
 /* PPM to percent:
  x(%) = x(ppm) / 10,000
  
@@ -51,7 +58,7 @@
 
 /*! Define for debuging to enable Serail Print
   IMPORTANT: undef when in production code */
-#undef CO2_SENSOR_CAN_ENABLE_SERIAL_PRINT 
+#define CO2_SENSOR_CAN_ENABLE_SERIAL_PRINT 
 
 /*! Use the below Macros for Serail Print.
    This enabled for high level contorl to disable all Serail Print for production */
@@ -65,6 +72,24 @@
 #define CO2_SENSOR_CAN_SERIAL_PRINT_EXT(OUTPUT_STRING, format)
 #endif 
 
+struct co2_sensor_can_eeprom_crc_s
+{
+  uint32_t cookie;
+  uint32_t signature;
+  uint32_t crc;
+};
+
+#define EEPROM_MAX_ADDR  (EEPROM.length() - 1)
+#define EEPROM_NEW_CAN_ID_ADDR   0 
+#define EEPROM_PPM_CONV_ADDR 1
+#define COOKIE         0xDB9FD74D
+#define SIGNATURE      0x8B772C32
+#define CRC            (COOKIE ^ SIGNATURE)
+
+#define CRC_BYTE_SIZE sizeof(co2_sensor_can_eeprom_crc_s)
+#define CRC_ADDRS     (EEPROM_MAX_ADDR - CRC_BYTE_SIZE)
+
+
 /*! Globals */
 /*! Software Serial for C02 Sensor Data. RX, TX */
 SoftwareSerial co2_sensor_serial(CO2_SENSOR_CAN_SW_SERIAL_RX_PIN, CO2_SENSOR_CAN_SW_SERIAL_TX_PIN); 
@@ -72,6 +97,9 @@ SoftwareSerial co2_sensor_serial(CO2_SENSOR_CAN_SW_SERIAL_RX_PIN, CO2_SENSOR_CAN
 mcp2515_can CAN(CO2_SENSOR_CAN_SPI_CS_PIN); 
 /*! Conversion multiplier to ppm from CO2 Sensor RX data */
 uint32_t co2_sensor_can_ppm_conv = 10;
+
+/*! Default CAN ID */
+uint32_t co2_sensor_can_ext_id   = 0xFF2800;
 
 void setup()
 {
@@ -86,6 +114,36 @@ void setup()
         delay(100);
     }
     CO2_SENSOR_CAN_SERIAL_PRINTLN("CAN init ok!");
+
+    Serial.println(EEPROM_MAX_ADDR);
+    Serial.println(CRC_BYTE_SIZE);
+    Serial.println(CRC_ADDRS);
+
+    co2_sensor_can_eeprom_crc_s check_crc_mem;
+    EEPROM.get( CRC_ADDRS, check_crc_mem );
+    Serial.println( "Read custom object from EEPROM: " );
+    Serial.println( check_crc_mem.cookie );
+    Serial.println( check_crc_mem.signature );
+    Serial.println( check_crc_mem.crc );
+    if( ((check_crc_mem.cookie ^ check_crc_mem.signature) !=  check_crc_mem.crc) || 
+        (check_crc_mem.cookie != COOKIE))
+    {
+        /* Initialize EEPROM */
+        Serial.println( "Init EEPROM" );
+        co2_sensor_can_eeprom_crc_s init_crc_write;
+        init_crc_write.cookie = COOKIE;
+        init_crc_write.signature = SIGNATURE;
+        init_crc_write.crc = CRC;
+        // EEPROM.put(CRC_ADDRS, init_crc_write);
+
+        // EEPROM.put(EEPROM_NEW_CAN_ID_ADDR, co2_sensor_can_ext_id);
+        // EEPROM.put(EEPROM_PPM_CONV_ADDR, co2_sensor_can_ppm_conv);
+    }
+    else
+    {
+
+        /* GET */
+    }
 }
 
 void loop() {
@@ -96,6 +154,8 @@ void loop() {
     
     /* Request CO2 Sensor for CO2 Concentration Data */
     co2_sensor_serial.write("Z\r\n");
+	/* Query Mulitplier */
+	//co2_sensor_serial.write(".\r\n");
     if (co2_sensor_serial.available() > 0) {
         /* Read avail incoming byte */
         co2_sensor_serial_rx = co2_sensor_serial.readString();
@@ -141,6 +201,47 @@ void loop() {
             
     } /* End of Sensor Serial Avalibale Check */
 
+    unsigned char len = 0;
+    unsigned char can_rx_buf[8];   
+
+    if (CAN_MSGAVAIL == CAN.checkReceive()) {         // check if data coming
+        CAN.readMsgBuf(&len, can_rx_buf);    // read data,  len: data length, buf: data buf
+
+        unsigned long canId = CAN.getCanId();
+
+        CO2_SENSOR_CAN_SERIAL_PRINTLN("-----------------------------");
+        CO2_SENSOR_CAN_SERIAL_PRINT("Get data from ID: 0x");
+        CO2_SENSOR_CAN_SERIAL_PRINT_EXT(canId, HEX);
+        CO2_SENSOR_CAN_SERIAL_PRINT("\t");
+        for (int i = 0; i < len; i++) { // print the data
+            CO2_SENSOR_CAN_SERIAL_PRINT_EXT(can_rx_buf[i], HEX);
+            CO2_SENSOR_CAN_SERIAL_PRINT("\t");
+        }
+        if(canId == CO2_SENSOR_CHANGE_NEW_CAN_ID)
+        {
+
+            
+        }
+        uint32_t new_can_id; 
+        new_can_id = unpack_left_shift_u32(can_rx_buf[0], 24u, 0xffu);
+        new_can_id |= unpack_left_shift_u32(can_rx_buf[1], 16u, 0xffu);
+        new_can_id |= unpack_left_shift_u32(can_rx_buf[2], 8u, 0xffu);
+        new_can_id |= unpack_left_shift_u32(can_rx_buf[3], 0u, 0xffu);
+        
+
+        CO2_SENSOR_CAN_SERIAL_PRINTLN();
+        CO2_SENSOR_CAN_SERIAL_PRINT_EXT(new_can_id, HEX);
+        CO2_SENSOR_CAN_SERIAL_PRINTLN();
+    }
+
     /* Loop Dealy, to query CO2 Sensor Data Every X Seconds */
     delay(CO2_SENSOR_CAN_LOOP_DELAY); 
+}
+
+uint32_t unpack_left_shift_u32(
+    uint8_t value,
+    uint8_t shift,
+    uint8_t mask)
+{
+    return (uint32_t)((uint32_t)(value & mask) << shift);
 }
