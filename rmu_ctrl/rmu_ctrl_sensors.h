@@ -13,6 +13,10 @@
 #define RMU_CTRL_SENSORS_EGT_ALL_RECV_BMSK           ((1 << MAX_EGT_SENSORS) - 1)
 
 
+#define RMU_CTRL_SENSORS_EGH_SLOPE  0.03892
+#define RMU_CTRL_SENSORS_EGH_OFFSET -42.017
+
+
 enum {
 
 AT_EXHAUST = 0,
@@ -52,8 +56,6 @@ typedef struct
 
   float thermo;
   float humidity;
-
-
                                       
 }rmu_ctrl_sensors_humidity_data_s;
 
@@ -62,7 +64,7 @@ typedef struct
 {
 
   rmu_ctrl_sensors_humidity_data_s data[RMU_CTRL_DEFS_MAX_EGH_SENSORS];
-
+  uint8_t adc_pins_tbl[RMU_CTRL_DEFS_MAX_EGH_SENSORS] = {A10, A11};
 
                                       
 }rmu_ctrl_sensors_humidity_s;

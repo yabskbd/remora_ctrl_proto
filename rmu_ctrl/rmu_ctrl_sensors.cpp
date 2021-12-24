@@ -31,10 +31,10 @@ int rmu_ctrl_sensors_sweep()
     Sprint_HP("beginning sweep 0x");
     Sprintln_ext_HP(egt_info_ptr->recv_egt_bmsk, HEX);
     /* Preassure Sensor Sweep */
-    rmu_ctrl_sensors_egp_fetch_data();
+    //rmu_ctrl_sensors_egp_fetch_data();
 
     /* Humidity Sensor Sweep */
-    //rmu_ctrl_sensors_egh_fetch_data();
+    rmu_ctrl_sensors_egh_fetch_data();
 
     /* Fan Data Sweep */
     rmu_ctrl_sensors_ptr->fan_data[0] = digitalRead(RMU_CTRL_DEFS_FAN_DI_0);
@@ -96,28 +96,23 @@ void rmu_ctrl_sensors_egh_fetch_data()
 {
 
   rmu_ctrl_sensors_humidity_s * egh_info_ptr = &(rmu_ctrl_sensors_ptr->egh_info);
-  double hum_val, thermo_val;
+  int adc_pin, adc_val;
+
+  for (uint32_t egh_idx = 0; egh_idx < RMU_CTRL_DEFS_MAX_EGH_SENSORS; ++egh_idx)
+  {
+    adc_pin = egh_info_ptr->adc_pins_tbl[egh_idx];
+    adc_val = analogRead(adc_pin);
+    delay(500);
+    Sprint("EGH ADC Raw Value ");
+    Sprintln(adc_val);
+    double mv_out = rmu_utils_adc_range_based_interpreter(adc_val, RMU_CTRL_DEFS_EGH_RH_MIN, RMU_CTRL_DEFS_EGH_RH_MAX, 0);
+    double relative_humidity = RMU_CTRL_SENSORS_EGH_SLOPE * mv_out + RMU_CTRL_SENSORS_EGH_OFFSET;
+    Sprint("relative_humidity ");
+    Sprintln(relative_humidity); 
 
 
-  float temp_c;
-  float temp_f;
-  float humidity;
-
-  // Read values from the sensor
-  temp_c = sht1x.readTemperatureC();
-  humidity = sht1x.readHumidity();
-
-  // Print the values to the serial port
-  Serial.print("Temperature: ");
-  Serial.print(temp_c, DEC);
-  Serial.print("C / ");
-
-  Serial.print(humidity);
-  Serial.println("%");
-
-  egh_info_ptr->data[0].humidity    = humidity;
-  egh_info_ptr->data[0].thermo      = temp_c;
-    
+    egh_info_ptr->data[egh_idx].humidity    = relative_humidity;
+  }
 
 }
 
@@ -132,7 +127,7 @@ void rmu_ctrl_sensors_egp_fetch_data()
   {
     adc_pin = egp_info_ptr->adc_pins_tbl[ept_tbl_idx];
     adc_val = analogRead(adc_pin);
-
+    delay(500);
     if(ept_tbl_idx < MAX_EGP_NEG15_15_SENSORS)
     {
       gague_psi = rmu_utils_adc_range_based_interpreter(adc_val, -15, 15, RMU_CTRL_DEFS_EGP_ADC_VAL_OFFSET);

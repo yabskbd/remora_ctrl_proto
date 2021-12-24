@@ -66,15 +66,19 @@ void setup() {
   rmu_ctrl_sesnors_init();
 
   last_sensor_sweep_ms = millis();
+  if(MAX_EGT_SENSORS > 0)
+  {  
+    while (CAN_OK != CAN.begin(CAN_BAUD_RATE)) 
+    {    
+      // init can bus : baudrate = 500k
+      Sprintln("CAN init fail, retry...");
+      delay(100);
+    }
+    Sprint("CAN init success.. baud_rate: ");
+    Sprintln(CAN_BAUD_RATE);
 
-  while (CAN_OK != CAN.begin(CAN_BAUD_RATE)) 
-  {    
-    // init can bus : baudrate = 500k
-    Sprintln("CAN init fail, retry...");
-    delay(100);
   }
-  Sprint("CAN init success.. baud_rate: ");
-  Sprintln(CAN_BAUD_RATE);
+
   
   //TODO create RF_INIT 
   // the RF sensor shouldn't need to be initialized
@@ -96,6 +100,7 @@ void loop() {
   /* Fetch CAN BUS Data */
   fetch_canbus_data();
   schedule_sweep();
+  delay(2000);
 
 }
 
@@ -109,42 +114,47 @@ void fetch_canbus_data()
   /* Fetch CAN BUS Data */
   // variables used for CAN messages
   uint8_t  len = 0;
-  while(CAN_MSGAVAIL == CAN.checkReceive())            // check if data coming
-  {
-
-    CAN.readMsgBuf(&len, can_data_buf);    // read data,  len: data length, buf: data buf
-    
-    unsigned long can_id = CAN.getCanId();            // get CAN id to match to task
-    
-    Sprint("-----------------------------");
-    Sprint_HP("Get data from ID: 0x");
-    Sprintln_ext_HP(can_id, HEX);
-    
-#ifdef RMU_UTILS_EN_LP_PRINT
-    for (int i = 0; i < len; i++) { // print the data
-        Sprint_ext(can_data_buf[i], HEX);
-        Sprint("\t");
-    }
-    Sprintln();
-#endif
-
-    switch(can_id)
+  if(MAX_EGT_SENSORS > 0)
+  {  
+    while(CAN_MSGAVAIL == CAN.checkReceive())            // check if data coming
     {
-      case EGT_CAN_ID_0_1:  
-      case EGT_CAN_ID_2_3: 
-      case EGT_CAN_ID_4_5: 
-      case EGT_CAN_ID_6_7: 
-      case EGT_CAN_ID_8_9: 
-      case EGT_CAN_ID_10_11:
-      case EGT_CAN_ID_12_13:
-      case EGT_CAN_ID_14_15:
-      {
-        rmu_ctrl_sensors_parse_egt_data(can_id, len, &can_data_buf[0]);
-        break;
+  
+      CAN.readMsgBuf(&len, can_data_buf);    // read data,  len: data length, buf: data buf
+      
+      unsigned long can_id = CAN.getCanId();            // get CAN id to match to task
+      
+      Sprint("-----------------------------");
+      Sprint_HP("Get data from ID: 0x");
+      Sprintln_ext_HP(can_id, HEX);
+      
+#ifdef RMU_UTILS_EN_LP_PRINT
+      for (int i = 0; i < len; i++) { // print the data
+          Sprint_ext(can_data_buf[i], HEX);
+          Sprint("\t");
       }
+      Sprintln();
+#endif
+  
+      switch(can_id)
+      {
+        case EGT_CAN_ID_0_1:  
+        case EGT_CAN_ID_2_3: 
+        case EGT_CAN_ID_4_5: 
+        case EGT_CAN_ID_6_7: 
+        case EGT_CAN_ID_8_9: 
+        case EGT_CAN_ID_10_11:
+        case EGT_CAN_ID_12_13:
+        case EGT_CAN_ID_14_15:
+        {
+          rmu_ctrl_sensors_parse_egt_data(can_id, len, &can_data_buf[0]);
+          break;
+        }
+      }
+  
     }
 
   }
+
 
 }
 
@@ -223,10 +233,6 @@ void storeData() {
   {
     hdr  += "EGH_in_HUM_" + String(egh_cnt) + ",";
     data += ctrl_sensors_ptr->egh_info.data[egh_cnt].humidity;
-    data += ",";
-
-    hdr  += "EGH_in_Thermo_C_" + String(egh_cnt) + ",";
-    data += ctrl_sensors_ptr->egh_info.data[egh_cnt].thermo;
     data += ",";
   }
    hdr += "Fan_0";

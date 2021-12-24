@@ -47,6 +47,10 @@ int sensorPin = A11;    // select the input pin for the potentiometer
 int ledPin = 13;      // select the pin for the LED
 int sensorValue = 0;  // variable to store the value coming from the sensor
 
+
+#define HUM_SENSOR_0    A0
+#define HUM_SENSOR_1    A1
+
 /*! Input adc_raw_value, the Min & Max of the Range of the particular unit of interest, and offset value to transform to
    Volts. Returns the value within range for the respective adc_val Required: min_range < max_range */
 double rmu_utils_adc_range_based_interpreter(int adc_val, double min_range, double max_range, double offset)

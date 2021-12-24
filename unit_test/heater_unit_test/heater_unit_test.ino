@@ -1,6 +1,8 @@
 #define NUM_HEATERS 4
 #define HEATERS_TO_TURN_ON_AT_ONCE 2
-#define SLEEP_TIME_S 10
+#define OVERLAP_SLEEP_TIME_S 2
+
+#define INDV_SLEEP_TIME_S 5
 
 
 #define HEATER_CTRL_1 31
@@ -50,11 +52,13 @@ void off_heater(int * heater_set)
 void loop() {
 	/*Turn Set 1 on */
 	on_heater(set1_heater);
-    delay(1000 * SLEEP_TIME_S);
-	off_heater(set1_heater);
-	delay(1000);
+	delay(1000 * INDV_SLEEP_TIME_S);
 	on_heater(set2_heater);
-	delay(1000 * SLEEP_TIME_S);
+	
+	delay(1000 * OVERLAP_SLEEP_TIME_S);
+	
+	off_heater(set1_heater);
+	delay(1000 * INDV_SLEEP_TIME_S);
 	off_heater(set2_heater);
-	delay(1000);
+	
 }

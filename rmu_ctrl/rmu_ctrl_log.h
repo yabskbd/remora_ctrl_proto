@@ -39,7 +39,7 @@ class DataLogger {
     bool initSensors();
     bool initSEN0220();
     RTC_PCF8523 rtc;
-    int thermocouples[MAX_EGT_SENSORS] = {A0, 
+    int thermocouples[8] = {A0, 
                                           A1, 
                                           A2, 
                                           A3,

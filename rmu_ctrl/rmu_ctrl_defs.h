@@ -53,7 +53,7 @@
 /*! MAX Sensor Counts */
 
 /*! Exhaust Gas Temprature Sensors */
-#define MAX_EGT_SENSORS                8
+#define MAX_EGT_SENSORS                0
 
 /*! Exhaust Gas Preassure Sensors */
 #define MAX_EGP_NEG15_15_SENSORS                0
@@ -61,7 +61,10 @@
 #define MAX_EGP_2K_SENSORS                      0
 #define MAX_EGP_SENSORS                         (MAX_EGP_NEG15_15_SENSORS + MAX_EPG_30_SENSORS + MAX_EGP_2K_SENSORS)
 
-#define RMU_CTRL_DEFS_MAX_EGH_SENSORS           1
+
+#define RMU_CTRL_DEFS_EGH_RH_MIN 0
+#define RMU_CTRL_DEFS_EGH_RH_MAX 5000.0
+#define RMU_CTRL_DEFS_MAX_EGH_SENSORS           2
 
 
 #define RMU_CTRL_DEFS_EGP_OFFSET_VOLTAGE          0.5
