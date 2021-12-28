@@ -57,13 +57,13 @@
 
 /*! Define for debuging to enable Serail Print
   IMPORTANT: undef when in production code */
-#define CO2_SENSOR_CAN_ENABLE_SERIAL_PRINT 
+#undef CO2_SENSOR_CAN_ENABLE_SERIAL_PRINT 
 
 /*! Use the below Macros for Serail Print.
    This enabled for high level contorl to disable all Serail Print for production */
 #ifdef CO2_SENSOR_CAN_ENABLE_SERIAL_PRINT
 #define CO2_SENSOR_CAN_SERIAL_PRINT(OUTPUT_STRING) Serial.print(OUTPUT_STRING)
-#define CO2_SENSOR_CAN_SERIAL_PRINTLN(OUTPUT_STRING) Serial.println(OUTPUT_STRING)
+#define CO2_SENSOR_CAN_SERIAL_PRINTLN(OUTPUT_STRING) CO2_SENSOR_CAN_SERIAL_PRINTLN(OUTPUT_STRING)
 #define CO2_SENSOR_CAN_SERIAL_PRINT_EXT(OUTPUT_STRING, format) Serial.print(OUTPUT_STRING, format)
 #else
 #define CO2_SENSOR_CAN_SERIAL_PRINT(OUTPUT_STRING) 
@@ -115,21 +115,21 @@ void setup()
     }
     CO2_SENSOR_CAN_SERIAL_PRINTLN("CAN init ok!");
 
-    Serial.println(EEPROM_MAX_ADDR);
-    Serial.println(CRC_BYTE_SIZE);
-    Serial.println(CRC_ADDRS);
+    CO2_SENSOR_CAN_SERIAL_PRINTLN(EEPROM_MAX_ADDR);
+    CO2_SENSOR_CAN_SERIAL_PRINTLN(CRC_BYTE_SIZE);
+    CO2_SENSOR_CAN_SERIAL_PRINTLN(CRC_ADDRS);
 
     co2_sensor_can_eeprom_crc_s check_crc_mem;
     EEPROM.get( CRC_ADDRS, check_crc_mem );
-    Serial.println( "Read custom object from EEPROM: " );
-    Serial.println( check_crc_mem.cookie );
-    Serial.println( check_crc_mem.signature );
-    Serial.println( check_crc_mem.crc );
+    CO2_SENSOR_CAN_SERIAL_PRINTLN("Read custom object from EEPROM: ");
+    CO2_SENSOR_CAN_SERIAL_PRINTLN(check_crc_mem.cookie);
+    CO2_SENSOR_CAN_SERIAL_PRINTLN(check_crc_mem.signature);
+    CO2_SENSOR_CAN_SERIAL_PRINTLN(check_crc_mem.crc);
     if( ((check_crc_mem.cookie ^ check_crc_mem.signature) !=  check_crc_mem.crc) || 
         (check_crc_mem.cookie != COOKIE))
     {
         /* Initialize EEPROM */
-        Serial.println( "Init EEPROM" );
+        CO2_SENSOR_CAN_SERIAL_PRINTLN("Init EEPROM");
         co2_sensor_can_eeprom_crc_s init_crc_write;
         init_crc_write.cookie = COOKIE;
         init_crc_write.signature = SIGNATURE;
@@ -142,7 +142,7 @@ void setup()
     else
     {
         /* GET */
-		Serial.println( "GET EEPROM" );
+		CO2_SENSOR_CAN_SERIAL_PRINTLN("GET EEPROM");
 		EEPROM.get(EEPROM_CAN_ID_ADDR, co2_sensor_can_ext_id);
 		EEPROM.get(EEPROM_PPM_CONV_ADDR, co2_sensor_can_ppm_conv);
     }
