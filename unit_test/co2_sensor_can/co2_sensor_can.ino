@@ -35,11 +35,11 @@
 /* CAN ID: J1939 PGN 65320 = 0xFF2800 */
 #define CO2_SENSOR_CAN_EXTENDED_ID  0xFF2800
 
-#define CO2_SENSOR_CHANGE_NEW_CAN_ID    0xFF28FF
-#define CO2_SENSOR_CHANGE_CONV_PPM      0xFF28FE
+#define CO2_SENSOR_CHANGE_CAN_ID    0xFF28FF
+#define CO2_SENSOR_CHANGE_CONV_PPM_ID      0xFF28FE
 
-#define CO2_SENSOR_CHANGE_NEW_CAN_ID_ACK    0xFF287F
-#define CO2_SENSOR_CHANGE_CONV_PPM_ACK      0xFF287E
+#define CO2_SENSOR_CHANGE_CAN_ID_ACK    0xFF287F
+#define CO2_SENSOR_CHANGE_CONV_PPM_ID_ACK      0xFF287E
 
 /* PPM to percent:
  x(%) = x(ppm) / 10,000
@@ -80,8 +80,8 @@ struct co2_sensor_can_eeprom_crc_s
 };
 
 #define EEPROM_MAX_ADDR  (EEPROM.length() - 1)
-#define EEPROM_NEW_CAN_ID_ADDR   0 
-#define EEPROM_PPM_CONV_ADDR 1
+#define EEPROM_CAN_ID_ADDR   0 
+#define EEPROM_PPM_CONV_ADDR     EEPROM_CAN_ID_ADDR + sizeof(uint32_t)
 #define COOKIE         0xDB9FD74D
 #define SIGNATURE      0x8B772C32
 #define CRC            (COOKIE ^ SIGNATURE)
@@ -134,22 +134,22 @@ void setup()
         init_crc_write.cookie = COOKIE;
         init_crc_write.signature = SIGNATURE;
         init_crc_write.crc = CRC;
-        // EEPROM.put(CRC_ADDRS, init_crc_write);
+        EEPROM.put(CRC_ADDRS, init_crc_write);
 
-        // EEPROM.put(EEPROM_NEW_CAN_ID_ADDR, co2_sensor_can_ext_id);
-        // EEPROM.put(EEPROM_PPM_CONV_ADDR, co2_sensor_can_ppm_conv);
+        EEPROM.put(EEPROM_CAN_ID_ADDR, co2_sensor_can_ext_id);
+        EEPROM.put(EEPROM_PPM_CONV_ADDR, co2_sensor_can_ppm_conv);
     }
     else
     {
-
         /* GET */
+		Serial.println( "GET EEPROM" );
+		EEPROM.get(EEPROM_CAN_ID_ADDR, co2_sensor_can_ext_id);
+		EEPROM.get(EEPROM_PPM_CONV_ADDR, co2_sensor_can_ppm_conv);
     }
 }
 
 void loop() {
-
-    /* CAN Data TX Buffer. init to all zero for each txs */
-    unsigned char can_tx_buf[CO2_SENSOR_CAN_MAX_CAN_DATA_BYTE] = {0, 0, 0, 0, 0, 0, 0, 0}; 
+ 
     String co2_sensor_serial_rx;   
     
     /* Request CO2 Sensor for CO2 Concentration Data */
@@ -179,26 +179,10 @@ void loop() {
         CO2_SENSOR_CAN_SERIAL_PRINTLN(co2_ppm);
         CO2_SENSOR_CAN_SERIAL_PRINT("size of co2_ppm ");
         CO2_SENSOR_CAN_SERIAL_PRINTLN(sizeof(co2_ppm));
-        /* moves data from uint32_t to char array to be TX over CAN */ 
-        memcpy(can_tx_buf, &co2_ppm, sizeof(co2_ppm)); 
-        /* Send CAN Data to Bus. 
-           IMPORTANT: Data is sent as Little Endian over CAN 
-           The order is LSB followed by MSB.
-           i.e 3750 ppm will be [A6, 0E] 
-           which will be 0x0EA6 */
-        CAN.sendMsgBuf(CO2_SENSOR_CAN_EXTENDED_ID, CO2_SENSOR_CAN_USE_EXTENDED_IDS, 
-                       CO2_SENSOR_CAN_MAX_CAN_DATA_BYTE, can_tx_buf); 
-        CO2_SENSOR_CAN_SERIAL_PRINTLN("CAN BUS sendMsgBuf ok!");
-#ifdef CO2_SENSOR_CAN_ENABLE_SERIAL_PRINT
-        /* Debug Priting of CAN MSG buf */
-        for (int buf_idx = 0; buf_idx < CO2_SENSOR_CAN_MAX_CAN_DATA_BYTE; buf_idx++)
-        { 
-            CO2_SENSOR_CAN_SERIAL_PRINT_EXT(can_tx_buf[buf_idx], HEX);
-            CO2_SENSOR_CAN_SERIAL_PRINT("\t");
-        }
-        CO2_SENSOR_CAN_SERIAL_PRINTLN(" ");
-#endif 
-            
+		
+		/* Send Data Over CANBus with the proper ID and Formated Data s */
+		send_can_msg(co2_sensor_can_ext_id, co2_ppm);
+		            
     } /* End of Sensor Serial Avalibale Check */
 
     unsigned char len = 0;
@@ -217,21 +201,47 @@ void loop() {
             CO2_SENSOR_CAN_SERIAL_PRINT_EXT(can_rx_buf[i], HEX);
             CO2_SENSOR_CAN_SERIAL_PRINT("\t");
         }
-        if(canId == CO2_SENSOR_CHANGE_NEW_CAN_ID)
-        {
-
-            
-        }
-        uint32_t new_can_id; 
-        new_can_id = unpack_left_shift_u32(can_rx_buf[0], 24u, 0xffu);
-        new_can_id |= unpack_left_shift_u32(can_rx_buf[1], 16u, 0xffu);
-        new_can_id |= unpack_left_shift_u32(can_rx_buf[2], 8u, 0xffu);
-        new_can_id |= unpack_left_shift_u32(can_rx_buf[3], 0u, 0xffu);
+		CO2_SENSOR_CAN_SERIAL_PRINTLN();
         
+		if(canId == CO2_SENSOR_CHANGE_CAN_ID)
+        {
+			uint32_t new_can_id = 0; 
+			new_can_id = unpack_left_shift_u32(can_rx_buf[3], 24u, 0xffu);
+			new_can_id |= unpack_left_shift_u32(can_rx_buf[2], 16u, 0xffu);
+			new_can_id |= unpack_left_shift_u32(can_rx_buf[1], 8u, 0xffu);
+			new_can_id |= unpack_left_shift_u32(can_rx_buf[0], 0u, 0xffu);
+			
+			CO2_SENSOR_CAN_SERIAL_PRINT_EXT(new_can_id, HEX);
+			CO2_SENSOR_CAN_SERIAL_PRINTLN();
+			EEPROM.put(EEPROM_CAN_ID_ADDR, new_can_id);
+			/* Send ACK */
+			send_can_msg(CO2_SENSOR_CHANGE_CAN_ID_ACK, new_can_id);
+			/* Set Current ID to New ID*/
+			co2_sensor_can_ext_id = new_can_id;
+        }
+		else if(canId == CO2_SENSOR_CHANGE_CONV_PPM_ID)
+		{
+			uint32_t new_conv_ppm = 0;
+			new_conv_ppm |= unpack_left_shift_u32(can_rx_buf[1], 8u, 0xffu);
+			new_conv_ppm |= unpack_left_shift_u32(can_rx_buf[0], 0u, 0xffu);
+			
+			CO2_SENSOR_CAN_SERIAL_PRINT("New PPM Conv value: ");
+			CO2_SENSOR_CAN_SERIAL_PRINTLN(new_conv_ppm);
+			if(new_conv_ppm != 0)
+			{
+				EEPROM.put(EEPROM_PPM_CONV_ADDR, new_conv_ppm);
+				co2_sensor_can_ppm_conv = new_conv_ppm;
+				/* Send ACK */
+				send_can_msg(CO2_SENSOR_CHANGE_CONV_PPM_ID_ACK, new_conv_ppm);
+			}
+			else
+			{
+				/* Send Current Value */
+				send_can_msg(CO2_SENSOR_CHANGE_CONV_PPM_ID_ACK, co2_sensor_can_ppm_conv);
+			}
 
-        CO2_SENSOR_CAN_SERIAL_PRINTLN();
-        CO2_SENSOR_CAN_SERIAL_PRINT_EXT(new_can_id, HEX);
-        CO2_SENSOR_CAN_SERIAL_PRINTLN();
+		}
+
     }
 
     /* Loop Dealy, to query CO2 Sensor Data Every X Seconds */
@@ -244,4 +254,31 @@ uint32_t unpack_left_shift_u32(
     uint8_t mask)
 {
     return (uint32_t)((uint32_t)(value & mask) << shift);
+}
+
+
+void send_can_msg (uint32_t can_id, uint32_t data)
+{
+	/* CAN Data TX Buffer. init to all zero for each txs */
+    unsigned char can_tx_buf[CO2_SENSOR_CAN_MAX_CAN_DATA_BYTE] = {0, 0, 0, 0, 0, 0, 0, 0};
+	/* moves data from uint32_t to char array to be TX over CAN */ 
+	memcpy(can_tx_buf, &data, sizeof(uint32_t)); 
+	/* Send CAN Data to Bus. 
+	   IMPORTANT: Data is sent as Little Endian over CAN 
+	   The order is LSB followed by MSB.
+	   i.e 3750 ppm will be [A6, 0E] 
+	   which will be 0x0EA6 */
+	CAN.sendMsgBuf(can_id, CO2_SENSOR_CAN_USE_EXTENDED_IDS, 
+				   CO2_SENSOR_CAN_MAX_CAN_DATA_BYTE, can_tx_buf); 
+	CO2_SENSOR_CAN_SERIAL_PRINTLN("CAN BUS sendMsgBuf ok!");
+#ifdef CO2_SENSOR_CAN_ENABLE_SERIAL_PRINT
+        /* Debug Priting of CAN MSG buf */
+        for (int buf_idx = 0; buf_idx < CO2_SENSOR_CAN_MAX_CAN_DATA_BYTE; buf_idx++)
+        { 
+            CO2_SENSOR_CAN_SERIAL_PRINT_EXT(can_tx_buf[buf_idx], HEX);
+            CO2_SENSOR_CAN_SERIAL_PRINT("\t");
+        }
+        CO2_SENSOR_CAN_SERIAL_PRINTLN(" ");
+#endif 
+	
 }
