@@ -1,7 +1,11 @@
 /****************************************************************************
  * 
  * Read in AIRFLOW SENSOR  
- * 
+ * Wiring:
+ * Red - 24V!!!! Needs to be 24V 
+ * Black - GND
+ * Yellow - GND
+ * Green  - TO Arduino Analgo Pin 1 or whatever analogPin value is below 
  *****************************************************************************/
 
 /*! Configrable value starts */
@@ -21,7 +25,7 @@ int airflow = 0;
 
 void setup() {
   Serial.begin(9600);           //  setup serial
-  Serial.print("Airflow is ACFM ");
+  Serial.print("Airflow in ACFM ");
 }
 
 void loop() {
