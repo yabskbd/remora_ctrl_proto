@@ -32,14 +32,13 @@
 #define CO2_SENSOR_CAN_BAUD_RATE CAN_500KBPS
 /* Use Extened CAN ID (29bit). This Macro is passed to send api */
 #define CO2_SENSOR_CAN_USE_EXTENDED_IDS    TRUE
-/* CAN ID: J1939 PGN 65320 = 0xFF2800 */
-#define CO2_SENSOR_CAN_EXTENDED_ID  0xFF2800
 
-#define CO2_SENSOR_CHANGE_CAN_ID    0xFF28FF
+/* CAN ID: J1939 PGN 65320 = 0xFF2800 */
+#define CO2_SENSOR_CHANGE_CAN_ID           0xFF28FF
 #define CO2_SENSOR_CHANGE_CONV_PPM_ID      0xFF28FE
 
-#define CO2_SENSOR_CHANGE_CAN_ID_ACK    0xFF287F
-#define CO2_SENSOR_CHANGE_CONV_PPM_ID_ACK      0xFF287E
+#define CO2_SENSOR_CHANGE_CAN_ID_ACK       0xFF287F
+#define CO2_SENSOR_CHANGE_CONV_PPM_ID_ACK  0xFF287E
 
 /* PPM to percent:
  x(%) = x(ppm) / 10,000
@@ -99,7 +98,8 @@ mcp2515_can CAN(CO2_SENSOR_CAN_SPI_CS_PIN);
 uint32_t co2_sensor_can_ppm_conv = 10;
 
 /*! Default CAN ID */
-uint32_t co2_sensor_can_ext_id   = 0xFF2800;
+/* CAN ID: J1939 PGN 65320 = 0xFF2800 */
+uint32_t co2_sensor_can_ext_id   = 0xFF2820;
 
 void setup()
 {
@@ -221,6 +221,7 @@ void loop() {
         }
 		else if(canId == CO2_SENSOR_CHANGE_CONV_PPM_ID)
 		{
+            /* Conv PPM must be in the first 2 Bytes in Little Endian format*/
 			uint32_t new_conv_ppm = 0;
 			new_conv_ppm |= unpack_left_shift_u32(can_rx_buf[1], 8u, 0xffu);
 			new_conv_ppm |= unpack_left_shift_u32(can_rx_buf[0], 0u, 0xffu);
@@ -236,6 +237,7 @@ void loop() {
 			}
 			else
 			{
+                /* first 2 bytes are zero then send out current multipler over CAN */
 				/* Send Current Value */
 				send_can_msg(CO2_SENSOR_CHANGE_CONV_PPM_ID_ACK, co2_sensor_can_ppm_conv);
 			}
