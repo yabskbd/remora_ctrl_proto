@@ -139,9 +139,6 @@ void loop() {
                     
     } /* End of Sensor Serial Avalibale Check */
 
-    unsigned char len = 0;
-    unsigned char can_rx_buf[8];   
-
     /* Loop Dealy, to query CO2 Sensor Data Every X Seconds */
     delay(CO2_SENSOR_CAN_LOOP_DELAY); 
 }
